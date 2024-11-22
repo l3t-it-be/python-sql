@@ -1,29 +1,33 @@
 import sqlite3
-from sqlite3 import OperationalError
-from typing import Tuple
+from sqlite3 import Connection, Cursor, OperationalError
+from typing import Self, Tuple
+
+import cmds
 
 
 class SQLAtm:
-    def __init__(self):
-        self.db_name = 'atm.db'
-        self.table_name = 'users_data'
+    def __init__(
+        self, db_name: str = "atm.db", table_name: str = "users_data"
+    ):
+        self.db_name = db_name
+        self.table_name = table_name
+        self.db: Connection | None = None
+        self.cursor: Cursor | None = None
 
-    """Создание таблицы"""
+    def __enter__(self) -> Self:
+        self.db = sqlite3.connect(self.db_name)
+        self.cursor = self.db.cursor()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        if self.db is not None:
+            self.db.close()
 
     def create_table(self) -> None:
-        with sqlite3.connect(self.db_name) as db:
-            cur = db.cursor()
-            cur.execute(
-                f"""CREATE TABLE IF NOT EXISTS {self.table_name}
-                (
-                    UserID INTEGER PRIMARY KEY,
-                    CardNumber INTEGER NOT NULL,
-                    PinCode INTEGER NOT NULL,
-                    Balance INTEGER NOT NULL,
-                    IsBlocked INTEGER DEFAULT 0
-                );
-                """
-            )
+        """Создание таблицы."""
+
+        script = cmds.CREATE_TABLE_USERS.format(table_name=self.table_name)
+        self.cursor.execute(script)
 
     """Добавление в таблицу пользователя, если пользователя с таким логином еще нет"""
 
@@ -52,35 +56,38 @@ class SQLAtm:
 
     def insert_card(self, card_number: str) -> bool:
         try:
-            with sqlite3.connect(self.db_name) as db:
-                cur = db.cursor()
-                cur.execute(
-                    f"""SELECT CardNumber, IsBlocked
-                        FROM {self.table_name}
-                        WHERE CardNumber = ?;
-                    """,
-                    (card_number,),
-                )
-                result = cur.fetchone()
-                if result is None:
-                    print('Введен неизвестный номер карты')
-                    return False
-                elif result[1] == 1:
-                    print('Карта заблокирована')
-                    return False
-                else:
-                    print(f'Введена карта с номером {card_number}')
-                    return True
+            self.cursor.execute(
+                f"""SELECT CardNumber, IsBlocked
+                    FROM {self.table_name}
+                    WHERE CardNumber = ?;
+                """,
+                (card_number,),
+            )
         except OperationalError:
-            print('Введен неизвестный номер карты')
+            print("Введен неизвестный номер карты")
             return False
+
+        return self._check_result(card_number)
+
+    def _check_result(self, card_number: str):
+        result = self.cursor.fetchone()
+        if result is None:
+            print("Введен неизвестный номер карты")
+            return False
+
+        if result[1] == 1:
+            print("Карта заблокирована")
+            return False
+
+        print(f"Введена карта с номером {card_number}")
+        return True
 
     """Ввод и проверка пин-кода"""
 
     def input_code(self, card_number: str) -> bool:
         attempts = 3
         while attempts > 0:
-            pin_code = input('Введите пин-код: ')
+            pin_code = input("Введите пин-код: ")
             with sqlite3.connect(self.db_name) as db:
                 cur = db.cursor()
                 cur.execute(
@@ -92,28 +99,28 @@ class SQLAtm:
                 result = cur.fetchone()
                 try:
                     if int(pin_code) == result[0]:
-                        print('Введен верный пин-код')
+                        print("Введен верный пин-код")
                         return True
                     else:
                         attempts -= 1
                         print(
-                            f'Неверный пин-код. Осталось попыток: {attempts}'
+                            f"Неверный пин-код. Осталось попыток: {attempts}"
                         )
                 except ValueError:
                     attempts -= 1
-                    print(f'Неверный пин-код. Осталось попыток: {attempts}')
+                    print(f"Неверный пин-код. Осталось попыток: {attempts}")
 
         # Блокировка карты после трех неудачных попыток
         with sqlite3.connect(self.db_name) as db:
             cur = db.cursor()
             cur.execute(
-                f"""UPDATE users_data
+                """UPDATE users_data
                         SET IsBlocked = 1
                         WHERE CardNumber = ?;
                     """,
                 (card_number,),
             )
-        print('Карта заблокирована')
+        print("Карта заблокирована")
         return False
 
     """Вывод на экран баланса карты"""
@@ -128,21 +135,21 @@ class SQLAtm:
                 """
             )
             result = cur.fetchone()
-            print(f'Баланс вашей карты: {result[0]} руб.')
+            print(f"Баланс вашей карты: {result[0]} руб.")
 
     """Снятие денежных средств с баланса карты"""
 
     def withdraw_money(self, card_number: str) -> bool:
         while True:
+            amount = input("Введите сумму, которую желаете снять: ")
             try:
-                amount = input('Введите сумму, которую желаете снять: ')
                 if int(amount) <= 0:
-                    print('Некорректное значение суммы денежных средств')
+                    print("Некорректное значение суммы денежных средств")
                     continue
                 else:
                     break
             except ValueError:
-                print('Некорректное значение')
+                print("Некорректное значение")
                 return False
 
         with sqlite3.connect(self.db_name) as db:
@@ -156,7 +163,7 @@ class SQLAtm:
             result = cur.fetchone()
 
             if int(amount) > result[0]:
-                print('На вашей карте недостаточно денежных средств')
+                print("На вашей карте недостаточно денежных средств")
                 return False
             else:
                 cur.execute(
@@ -174,14 +181,14 @@ class SQLAtm:
     def depositing_money(self, card_number: str) -> bool:
         while True:
             try:
-                amount = input('Введите сумму, которую желаете внести: ')
+                amount = input("Введите сумму, которую желаете внести: ")
                 if int(amount) <= 0:
-                    print('Некорректное значение суммы денежных средств')
+                    print("Некорректное значение суммы денежных средств")
                     continue
                 else:
                     break
             except ValueError:
-                print('Некорректное значение')
+                print("Некорректное значение")
                 return False
 
         with sqlite3.connect(self.db_name) as db:
