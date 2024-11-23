@@ -1,11 +1,30 @@
 import sqlite3
 from typing import Tuple
 
+from selene.common.data_structures.persistent import dataclass
+
+from exchanger_db.currencies_rates import ExchangeRate
+
+
+@dataclass
+class Balance:
+    rub: float
+    usd: float
+    eur: float
+
+    def __str__(self) -> str:
+        return (
+            f"Ваш баланс: \n"
+            f"RUB - {self.rub:.2f}\n"
+            f"USD - {self.usd:.2f}\n"
+            f"EUR - {self.eur:.2f}"
+        )
+
 
 class DBManager:
     def __init__(self):
-        self.db_name = 'exchanger.db'
-        self.table_name = 'users_balance'
+        self.db_name = "exchanger.db"
+        self.table_name = "users_balance"
 
     """Создание таблицы"""
 
@@ -35,7 +54,7 @@ class DBManager:
                 user_balance,
             )
             user_id = cur.lastrowid
-            print(f'Пользователь {user_id} успешно зарегистрирован')
+            print(f"Пользователь {user_id} успешно зарегистрирован")
             return user_id
 
     """Проверка того, что пользователь зарегистрирован в системе"""
@@ -64,12 +83,11 @@ class DBManager:
                 (user_id,),
             )
             balance = cur.fetchone()
-            print(
-                f'Ваш баланс: \n'
-                f'RUB - {round(balance[0], 2)}\n'
-                f'USD - {round(balance[1], 2)}\n'
-                f'EUR - {round(balance[2], 2)}'
-            )
+            if not balance:
+                print("Нет данных в БД")
+                return
+
+            print(Balance(*balance))
 
     """Проверка баланса"""
 
@@ -79,10 +97,8 @@ class DBManager:
         from_currency: str,
         to_currency: str,
         amount_to_receive: float,
-        *currencies: float,
+        exchange: ExchangeRate,
     ) -> bool:
-        usd_to_rub, euro_to_rub, usd_to_euro, euro_to_usd = currencies
-
         with sqlite3.connect(self.db_name) as db:
             cur = db.cursor()
             cur.execute(
@@ -94,52 +110,52 @@ class DBManager:
             )
             balance = cur.fetchone()
 
-            if from_currency == 'RUB':
-                if to_currency == 'USD':
+            if from_currency == "RUB":
+                if to_currency == "USD":
                     amount_to_withdraw = round(
-                        amount_to_receive * usd_to_rub, 2
+                        amount_to_receive * exchange.usd_to_rub, 2
                     )
                     return (
                         balance[0] >= amount_to_withdraw
                         and balance[1] >= amount_to_receive
                     )
-                elif to_currency == 'EUR':
+                elif to_currency == "EUR":
                     amount_to_withdraw = round(
-                        amount_to_receive * euro_to_rub, 2
+                        amount_to_receive * exchange.euro_to_rub, 2
                     )
                     return (
                         balance[0] >= amount_to_withdraw
                         and balance[2] >= amount_to_receive
                     )
-            elif from_currency == 'USD':
-                if to_currency == 'RUB':
+            elif from_currency == "USD":
+                if to_currency == "RUB":
                     amount_to_withdraw = round(
-                        amount_to_receive / usd_to_rub, 2
+                        amount_to_receive / exchange.usd_to_rub, 2
                     )
                     return (
                         balance[1] >= amount_to_withdraw
                         and balance[0] >= amount_to_receive
                     )
-                elif to_currency == 'EUR':
+                elif to_currency == "EUR":
                     amount_to_withdraw = round(
-                        amount_to_receive * usd_to_euro, 2
+                        amount_to_receive * exchange.usd_to_euro, 2
                     )
                     return (
                         balance[1] >= amount_to_withdraw
                         and balance[2] >= amount_to_receive
                     )
-            elif from_currency == 'EUR':
-                if to_currency == 'RUB':
+            elif from_currency == "EUR":
+                if to_currency == "RUB":
                     amount_to_withdraw = round(
-                        amount_to_receive / euro_to_rub, 2
+                        amount_to_receive / exchange.euro_to_rub, 2
                     )
                     return (
                         balance[2] >= amount_to_withdraw
                         and balance[0] >= amount_to_receive
                     )
-                elif to_currency == 'USD':
+                elif to_currency == "USD":
                     amount_to_withdraw = round(
-                        amount_to_receive * euro_to_usd, 2
+                        amount_to_receive * exchange.euro_to_usd, 2
                     )
                     return (
                         balance[2] >= amount_to_withdraw
@@ -156,26 +172,20 @@ class DBManager:
         from_currency: str,
         to_currency: str,
         user_id: int,
-        *currencies: int | float,
+        exchange: ExchangeRate,
     ) -> None:
         if amount_to_receive <= 0:
-            print('Нельзя обменивать нулевую или отрицательную сумму.')
+            print("Нельзя обменивать нулевую или отрицательную сумму.")
             return
-
-        if len(currencies) != 4:
-            print('Неверное количество курсов валют.')
-            return
-
-        usd_to_rub, euro_to_rub, usd_to_euro, euro_to_usd = currencies
 
         with sqlite3.connect(self.db_name) as db:
             cur = db.cursor()
 
             try:
-                if from_currency == 'RUB':
-                    if to_currency == 'USD':
+                if from_currency == "RUB":
+                    if to_currency == "USD":
                         amount_to_withdraw = round(
-                            amount_to_receive * usd_to_rub, 2
+                            amount_to_receive * exchange.usd_to_rub, 2
                         )
                         cur.execute(
                             f"""UPDATE {self.table_name}
@@ -185,9 +195,9 @@ class DBManager:
                                 """,
                             (amount_to_withdraw, amount_to_receive, user_id),
                         )
-                    elif to_currency == 'EUR':
+                    elif to_currency == "EUR":
                         amount_to_withdraw = round(
-                            amount_to_receive * euro_to_rub, 2
+                            amount_to_receive * exchange.euro_to_rub, 2
                         )
                         cur.execute(
                             f"""UPDATE {self.table_name}
@@ -197,10 +207,10 @@ class DBManager:
                                 """,
                             (amount_to_withdraw, amount_to_receive, user_id),
                         )
-                elif from_currency == 'USD':
-                    if to_currency == 'RUB':
+                elif from_currency == "USD":
+                    if to_currency == "RUB":
                         amount_to_withdraw = round(
-                            amount_to_receive / usd_to_rub, 2
+                            amount_to_receive / exchange.usd_to_rub, 2
                         )
                         cur.execute(
                             f"""UPDATE {self.table_name}
@@ -210,9 +220,9 @@ class DBManager:
                                 """,
                             (amount_to_withdraw, amount_to_receive, user_id),
                         )
-                    elif to_currency == 'EUR':
+                    elif to_currency == "EUR":
                         amount_to_withdraw = round(
-                            amount_to_receive * usd_to_euro, 2
+                            amount_to_receive * exchange.usd_to_euro, 2
                         )
                         cur.execute(
                             f"""UPDATE {self.table_name}
@@ -222,10 +232,10 @@ class DBManager:
                                 """,
                             (amount_to_withdraw, amount_to_receive, user_id),
                         )
-                elif from_currency == 'EUR':
-                    if to_currency == 'RUB':
+                elif from_currency == "EUR":
+                    if to_currency == "RUB":
                         amount_to_withdraw = round(
-                            amount_to_receive / euro_to_rub, 2
+                            amount_to_receive / exchange.euro_to_rub, 2
                         )
                         cur.execute(
                             f"""UPDATE {self.table_name}
@@ -235,9 +245,9 @@ class DBManager:
                                 """,
                             (amount_to_withdraw, amount_to_receive, user_id),
                         )
-                    elif to_currency == 'USD':
+                    elif to_currency == "USD":
                         amount_to_withdraw = round(
-                            amount_to_receive * euro_to_usd, 2
+                            amount_to_receive * exchange.euro_to_usd, 2
                         )
                         cur.execute(
                             f"""UPDATE {self.table_name}
@@ -248,10 +258,10 @@ class DBManager:
                             (amount_to_withdraw, amount_to_receive, user_id),
                         )
                 else:
-                    print('Неверная валюта')
+                    print("Неверная валюта")
                     return
 
-                print(f'Обмен валюты успешно завершен')
+                print("Обмен валюты успешно завершен")
             except Exception as e:
                 db.rollback()  # Отменить изменения при ошибке
-                print(f'Ошибка при обмене валюты: {e}')
+                print(f"Ошибка при обмене валюты: {e}")

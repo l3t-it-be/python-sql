@@ -1,0 +1,10 @@
+CREATE_TABLE_USERS = """
+  CREATE TABLE IF NOT EXISTS {table_name}
+  (
+    UserID INTEGER PRIMARY KEY,
+    CardNumber INTEGER NOT NULL,
+    PinCode INTEGER NOT NULL,
+    Balance INTEGER NOT NULL,
+    IsBlocked INTEGER DEFAULT 0
+  );
+"""

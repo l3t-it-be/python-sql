@@ -1,15 +1,22 @@
-from typing import Tuple
-
+from attr import dataclass
 from selene import browser, query
 from selene.support.shared.jquery_style import s, ss
 from selenium import webdriver
+
+
+@dataclass(kw_only=True)
+class ExchangeRate:
+    usd_to_rub: float
+    euro_to_rub: float
+    usd_to_euro: float
+    euro_to_usd: float
 
 
 class Currencies:
     """Получение курсов валют"""
 
     @staticmethod
-    def get_exchange_rates() -> Tuple[float, float, float, float]:
+    def get_exchange_rates() -> ExchangeRate:
         # Настраиваем работу браузера
         browser_options = webdriver.ChromeOptions()
         browser_options.page_load_strategy = 'eager'
@@ -41,9 +48,9 @@ class Currencies:
             query.attribute('value')
         )
 
-        return (
-            float(usd_to_rub),
-            float(euro_to_rub),
-            float(usd_to_euro),
-            float(euro_to_usd),
+        return ExchangeRate(
+            usd_to_rub=float(usd_to_rub),
+            euro_to_rub=float(euro_to_rub),
+            usd_to_euro=float(usd_to_euro),
+            euro_to_usd=float(euro_to_usd),
         )

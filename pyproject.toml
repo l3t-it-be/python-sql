@@ -1,3 +1,23 @@
 [tool.black]
 line-length = 79
 skip-string-normalization = true
+extend-exclude = 'env|.env|venv|.venv'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.ruff]
+lint.select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    # "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+lint.ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
