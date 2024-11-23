@@ -28,6 +28,8 @@ class SQLAtm:
         if self.db is not None:
             self.db.close()
 
+    """Создание таблицы"""
+
     def create_table(self) -> None:
         script = cmds.CREATE_TABLE_USERS_DATA.format(
             table_name=self.table_name
@@ -36,6 +38,8 @@ class SQLAtm:
             self.cursor.execute(script)
         except OperationalError as e:
             print(f'Ошибка при создании таблицы: {e}')
+
+    """Добавление в таблицу пользователя (если такого еще нет)"""
 
     def add_new_user(self, users_data: UserData) -> None:
         try:
@@ -68,6 +72,8 @@ class SQLAtm:
         except OperationalError as e:
             print(f'Ошибка при добавлении нового пользователя: {e}')
 
+    """Проверка номера введенной карты"""
+
     def check_result(self, card_number: str) -> bool:
         result = self.cursor.fetchone()
         if result is None:
@@ -82,6 +88,8 @@ class SQLAtm:
 
         print(f'Введена карта с номером {card_number}')
         return True
+
+    """Ввод карты и пин-кода"""
 
     def insert_card(self, card_number: str) -> bool:
         try:
@@ -134,6 +142,8 @@ class SQLAtm:
         print('Карта заблокирована')
         return False
 
+    """Вывод баланса карты"""
+
     def show_balance(self, card_number: str) -> None:
         try:
             self.cursor.execute(
@@ -151,6 +161,8 @@ class SQLAtm:
                 print('Карта не найдена.')
         except OperationalError as e:
             print(f'Ошибка при получении баланса: {e}')
+
+    """Снятие денежных средств с карты"""
 
     def withdraw_money(self, card_number: str) -> bool:
         while True:
@@ -188,6 +200,8 @@ class SQLAtm:
 
         self.show_balance(card_number)
         return True
+
+    """Внесение денежных средств на карту"""
 
     def depositing_money(self, card_number: str) -> bool:
         while True:
