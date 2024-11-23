@@ -1,7 +1,8 @@
-from dataclasses import dataclass
 import sqlite3
+from dataclasses import dataclass
 from sqlite3 import OperationalError, Connection, Cursor
 from typing import Self
+
 import cmds
 
 
@@ -28,9 +29,8 @@ class SQLAtm:
         if self.db is not None:
             self.db.close()
 
-    """Создание таблицы"""
-
     def create_table(self) -> None:
+        """Создание таблицы"""
         script = cmds.CREATE_TABLE_USERS_DATA.format(
             table_name=self.table_name
         )
@@ -39,26 +39,21 @@ class SQLAtm:
         except OperationalError as e:
             print(f'Ошибка при создании таблицы: {e}')
 
-    """Добавление в таблицу пользователя (если такого еще нет)"""
-
     def add_new_user(self, users_data: UserData) -> None:
+        """Добавление в таблицу пользователя (если такого еще нет)"""
+        script = cmds.SELECT_CARD_NUMBER_IF_EXISTS.format(
+            table_name=self.table_name
+        )
+        self.cursor.execute(script, (users_data.card_number,))
+
+        user = self.cursor.fetchone()
         try:
-            self.cursor.execute(
-                f"""SELECT CardNumber
-                        FROM {self.table_name}
-                        WHERE CardNumber = ?
-                        LIMIT 1;
-                """,
-                (users_data.card_number,),
-            )
-            user = self.cursor.fetchone()
             if user is None:
+                script = cmds.INSERT_USERS_DATA.format(
+                    table_name=self.table_name
+                )
                 self.cursor.execute(
-                    f"""INSERT INTO {self.table_name}
-                                    (CardNumber, PinCode, Balance)
-                            VALUES
-                                (?, ?, ?);
-                        """,
+                    script,
                     (
                         users_data.card_number,
                         users_data.pin_code,
@@ -72,9 +67,8 @@ class SQLAtm:
         except OperationalError as e:
             print(f'Ошибка при добавлении нового пользователя: {e}')
 
-    """Проверка номера введенной карты"""
-
     def check_result(self, card_number: str) -> bool:
+        """Проверка номера введенной карты"""
         result = self.cursor.fetchone()
         if result is None:
             print(
@@ -89,36 +83,22 @@ class SQLAtm:
         print(f'Введена карта с номером {card_number}')
         return True
 
-    """Ввод карты и пин-кода"""
-
     def insert_card(self, card_number: str) -> bool:
-        try:
-            self.cursor.execute(
-                f"""SELECT CardNumber, IsBlocked
-                        FROM {self.table_name}
-                        WHERE CardNumber = ?
-                        LIMIT 1;
-                    """,
-                (card_number,),
-            )
-        except OperationalError as e:
-            print(f'Ошибка при поиске карты: {e}')
-            return False
+        """Ввод карты и пин-кода"""
+        script = cmds.SELECT_CARD_NUMBER_AND_IsBlocked.format(
+            table_name=self.table_name
+        )
+        self.cursor.execute(script, (card_number,))
 
         return self.check_result(card_number)
 
     def input_code(self, card_number: str) -> bool:
+        """Проверка пин-кода"""
         attempts = 3
         while attempts > 0:
             pin_code = input('Введите пин-код: ')
-            self.cursor.execute(
-                f"""SELECT PinCode
-                        FROM {self.table_name}
-                        WHERE CardNumber = ?
-                        LIMIT 1;
-                    """,
-                (card_number,),
-            )
+            script = cmds.SELECT_PIN_CODE.format(table_name=self.table_name)
+            self.cursor.execute(script, (card_number,))
             result = self.cursor.fetchone()
             try:
                 if int(pin_code) == result[0]:
@@ -132,39 +112,23 @@ class SQLAtm:
                 print(f'Неверный пин-код. Осталось попыток: {attempts}')
 
         # Блокировка карты после трех неудачных попыток
-        self.cursor.execute(
-            f"""UPDATE {self.table_name}
-                    SET IsBlocked = True
-                    WHERE CardNumber = ?;
-                    """,
-            (card_number,),
-        )
+        script = cmds.BLOCK_CARD_NUMBER.format(table_name=self.table_name)
+        self.cursor.execute(script, (card_number,))
         print('Карта заблокирована')
         return False
 
-    """Вывод баланса карты"""
-
     def show_balance(self, card_number: str) -> None:
-        try:
-            self.cursor.execute(
-                f"""SELECT Balance
-                        FROM {self.table_name}
-                        WHERE CardNumber = ?
-                        LIMIT 1;
-                    """,
-                (card_number,),
-            )
-            result = self.cursor.fetchone()
-            if result is not None:
-                print(f'Баланс вашей карты: {result[0]} руб.')
-            else:
-                print('Карта не найдена.')
-        except OperationalError as e:
-            print(f'Ошибка при получении баланса: {e}')
-
-    """Снятие денежных средств с карты"""
+        """Вывод баланса карты"""
+        script = cmds.SHOW_BALANCE.format(table_name=self.table_name)
+        self.cursor.execute(script, (card_number,))
+        result = self.cursor.fetchone()
+        if result is not None:
+            print(f'Баланс вашей карты: {result[0]} руб.')
+        else:
+            print('Карта не найдена.')
 
     def withdraw_money(self, card_number: str) -> bool:
+        """Снятие денежных средств с карты"""
         while True:
             try:
                 amount = input('Введите сумму, которую желаете снять: ')
@@ -177,26 +141,18 @@ class SQLAtm:
                 print('Некорректное значение')
                 return False
 
-        self.cursor.execute(
-            f"""SELECT Balance
-                    FROM {self.table_name}
-                    WHERE CardNumber = ?;
-                    """,
-            (card_number,),
-        )
+        script = cmds.SHOW_BALANCE.format(table_name=self.table_name)
+        self.cursor.execute(script, (card_number,))
         result = self.cursor.fetchone()
 
         if int(amount) > result[0]:
             print('На вашей карте недостаточно денежных средств')
             return False
         else:
-            self.cursor.execute(
-                f"""UPDATE {self.table_name}
-                        SET Balance = Balance - ?
-                        WHERE CardNumber = ?;
-                """,
-                (amount, card_number),
+            script = cmds.REDUCE_BALANCE.format(
+                table_name=self.table_name, amount=amount
             )
+            self.cursor.execute(script, (card_number,))
 
         self.show_balance(card_number)
         return True
@@ -216,13 +172,10 @@ class SQLAtm:
                 print('Некорректное значение')
                 return False
 
-        self.cursor.execute(
-            f"""UPDATE {self.table_name}
-                    SET Balance = Balance + ?
-                    WHERE CardNumber = ?;
-                """,
-            (amount, card_number),
+        script = cmds.INCREASE_BALANCE.format(
+            table_name=self.table_name, amount=amount
         )
+        self.cursor.execute(script, (card_number,))
 
         self.show_balance(card_number)
         return True
