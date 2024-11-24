@@ -1,8 +1,10 @@
-class CurrenciesOperations:
-    """Запрос валют, которые пользователь хочет обменять"""
+from exchanger_db.enums import OperationChoice
 
+
+class CurrenciesOperations:
     @staticmethod
     def get_currency_from_user(action: str) -> str:
+        """Запрос валют, которые пользователь хочет обменять"""
         currency = None
         while True:
             if action == 'get':
@@ -23,13 +25,13 @@ class CurrenciesOperations:
                 )
 
             currency_choice = input('Введите номер валюты: ')
-            if currency_choice == '1':
+            if currency_choice == OperationChoice.RUB:
                 currency = 'RUB'
-            elif currency_choice == '2':
+            elif currency_choice == OperationChoice.USD:
                 currency = 'USD'
-            elif currency_choice == '3':
+            elif currency_choice == OperationChoice.EURO:
                 currency = 'EUR'
-            elif currency_choice == '4':
+            elif currency_choice == OperationChoice.EXIT:
                 print('До свидания!')
                 exit()
             else:
@@ -41,10 +43,9 @@ class CurrenciesOperations:
 
         return currency
 
-    """Запрос денежной суммы, которую хочет получить пользователь"""
-
     @staticmethod
     def get_money_amount() -> float:
+        """Запрос денежной суммы, которую хочет получить пользователь"""
         while True:
             try:
                 amount = float(input('Какая сумма Вас интересует?\n'))
@@ -59,10 +60,9 @@ class CurrenciesOperations:
                 print('Введите числовое значение')
                 continue
 
-    """Выбор действия при недостаточном балансе"""
-
     @staticmethod
-    def make_choice():
+    def make_choice() -> None:
+        """Выбор действия при недостаточном балансе"""
         while True:
             choice = (
                 input(
