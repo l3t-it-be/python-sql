@@ -99,6 +99,7 @@ class SQLAtm:
             pin_code = input('Введите пин-код: ')
             script = cmds.SELECT_PIN_CODE.format(table_name=self.table_name)
             self.cursor.execute(script, (card_number,))
+
             result = self.cursor.fetchone()
             try:
                 if int(pin_code) == result[0]:
@@ -124,6 +125,7 @@ class SQLAtm:
         """Вывод баланса карты"""
         script = cmds.SHOW_BALANCE.format(table_name=self.table_name)
         self.cursor.execute(script, (card_number,))
+
         result = self.cursor.fetchone()
         if result is not None:
             print(f'Баланс вашей карты: {result[0]} руб.')
@@ -146,6 +148,7 @@ class SQLAtm:
 
         script = cmds.SHOW_BALANCE.format(table_name=self.table_name)
         self.cursor.execute(script, (card_number,))
+
         result = self.cursor.fetchone()
 
         if int(amount) > result[0]:

@@ -4,7 +4,7 @@ from enums import OperationChoice
 
 class Operation:
     @staticmethod
-    def choose_operation(card_number) -> None:
+    def choose_operation(card_number: str) -> None:
         with SQLAtm() as atm:
             while True:
                 print('Выберите действие:')

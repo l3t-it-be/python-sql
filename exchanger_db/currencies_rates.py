@@ -5,7 +5,7 @@ from selene.support.shared.jquery_style import s, ss
 from selenium import webdriver
 
 
-@dataclass(kw_only=True)
+@dataclass()
 class ExchangeRate:
     usd_to_rub: float
     euro_to_rub: float
@@ -35,15 +35,10 @@ class Currencies:
 
 
 currency = Currencies()
-
-usd_to_rub = currency.get_exchange_rate('usd to rub')
-euro_to_rub = currency.get_exchange_rate('euro to rub')
-usd_to_euro = currency.get_exchange_rate('usd to euro')
-euro_to_usd = currency.get_exchange_rate('euro to usd')
-
-exchange_rate = ExchangeRate(
-    usd_to_rub=usd_to_rub,
-    euro_to_rub=euro_to_rub,
-    usd_to_euro=usd_to_euro,
-    euro_to_usd=euro_to_usd,
+rates = list(
+    map(
+        currency.get_exchange_rate,
+        ['usd to rub', 'euro to rub', 'usd to euro', 'euro to usd'],
+    )
 )
+exchange_rates = ExchangeRate(*rates)

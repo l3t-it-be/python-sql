@@ -1,4 +1,4 @@
-from exchanger_db.currencies_rates import exchange_rate
+from exchanger_db.currencies_rates import exchange_rates
 from exchanger_db.operations import CurrenciesOperations
 from exchanger_db.sql_queries import DBManager, UserBalance
 
@@ -33,7 +33,7 @@ class Exchanger:
                     from_currency,
                     to_currency,
                     amount_to_receive,
-                    exchange_rate,
+                    exchange_rates,
                 )
 
                 if from_currency == to_currency:
@@ -49,7 +49,7 @@ class Exchanger:
                     from_currency,
                     to_currency,
                     user_id,
-                    exchange_rate,
+                    exchange_rates,
                 )
                 break
 
@@ -59,14 +59,14 @@ class Exchanger:
 def main():
     print(
         "Добро пожаловать в наш обменный пункт, курс валют следующий:\n"
-        f"1 USD = {exchange_rate.usd_to_rub} RUB\n"
-        f"1 EUR = {exchange_rate.euro_to_rub} RUB\n"
-        f"1 USD = {exchange_rate.usd_to_euro} EUR\n"
-        f"1 EUR = {exchange_rate.euro_to_usd} USD"
+        f"1 USD = {exchange_rates.usd_to_rub} RUB\n"
+        f"1 EUR = {exchange_rates.euro_to_rub} RUB\n"
+        f"1 USD = {exchange_rates.usd_to_euro} EUR\n"
+        f"1 EUR = {exchange_rates.euro_to_usd} USD"
     )
     start = Exchanger()
     start.exchanger_logic()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

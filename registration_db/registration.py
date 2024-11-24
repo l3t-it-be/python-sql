@@ -1,16 +1,17 @@
-from operations import Operation
-from sql_queries import UserManager
+from registration_db.operations import Operation
+from registration_db.sql_queries import UserManager
 
 
 class Registration:
     @staticmethod
     def registration_logic():
-        user = UserManager()
-        user.create_table()
-        user.add_new_user('Ivan', 'qwer1234', '1234')
-        operation = Operation()
-        operation.choose_operation()
+        with UserManager() as user:
+            user.create_table()
+            user.add_new_user('Ivan', 'qwer1234', '1234')
+            operation = Operation()
+            operation.choose_operation()
 
 
-start = Registration
-start.registration_logic()
+if __name__ == '__main__':
+    start = Registration()
+    start.registration_logic()

@@ -24,5 +24,6 @@ class ATM:
                     break
 
 
-start = ATM()
-start.atm_logic()
+if __name__ == '__main__':
+    start = ATM()
+    start.atm_logic()

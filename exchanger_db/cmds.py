@@ -16,9 +16,9 @@ VALUES
 """
 
 ASSERT_USER_IN_SYSTEM = """
-SELECT * FROM {table_name} 
-WHERE UserID = ?
-LIMIT 1;
+SELECT 1 
+FROM {table_name} 
+WHERE UserID = ?;
 """
 
 SHOW_BALANCE = """

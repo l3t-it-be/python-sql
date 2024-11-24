@@ -61,6 +61,7 @@ class DBManager:
         """Проверка того, что пользователь зарегистрирован в системе"""
         script = cmds.ASSERT_USER_IN_SYSTEM.format(table_name=self.table_name)
         self.cursor.execute(script, (user_id,))
+
         user = self.cursor.fetchone()
         return bool(user)
 
@@ -156,81 +157,73 @@ class DBManager:
             print('Нельзя обменивать нулевую или отрицательную сумму.')
             return
 
-        if len(exchange_rate.__dict__) != 4:
-            print('Неверное количество курсов валют.')
+        if from_currency == 'RUB':
+            if to_currency == 'USD':
+                amount_to_withdraw = round(
+                    amount_to_receive * exchange_rate.usd_to_rub, 2
+                )
+                script = cmds.UPDATE_BALANCE_RUB_TO_USD.format(
+                    table_name=self.table_name,
+                    amount_to_withdraw=amount_to_withdraw,
+                    amount_to_receive=amount_to_receive,
+                )
+                self.cursor.execute(script, (user_id,))
+            elif to_currency == 'EUR':
+                amount_to_withdraw = round(
+                    amount_to_receive * exchange_rate.euro_to_rub, 2
+                )
+                script = cmds.UPDATE_BALANCE_RUB_TO_EURO.format(
+                    table_name=self.table_name,
+                    amount_to_withdraw=amount_to_withdraw,
+                    amount_to_receive=amount_to_receive,
+                )
+                self.cursor.execute(script, (user_id,))
+
+        elif from_currency == 'USD':
+            if to_currency == 'RUB':
+                amount_to_withdraw = round(
+                    amount_to_receive / exchange_rate.usd_to_rub, 2
+                )
+                script = cmds.UPDATE_BALANCE_USD_TO_RUB.format(
+                    table_name=self.table_name,
+                    amount_to_withdraw=amount_to_withdraw,
+                    amount_to_receive=amount_to_receive,
+                )
+                self.cursor.execute(script, (user_id,))
+            elif to_currency == 'EUR':
+                amount_to_withdraw = round(
+                    amount_to_receive * exchange_rate.usd_to_euro, 2
+                )
+                script = cmds.UPDATE_BALANCE_USD_TO_EUR.format(
+                    table_name=self.table_name,
+                    amount_to_withdraw=amount_to_withdraw,
+                    amount_to_receive=amount_to_receive,
+                )
+                self.cursor.execute(script, (user_id,))
+
+        elif from_currency == 'EUR':
+            if to_currency == 'RUB':
+                amount_to_withdraw = round(
+                    amount_to_receive / exchange_rate.euro_to_rub, 2
+                )
+                script = cmds.UPDATE_BALANCE_EUR_TO_RUB.format(
+                    table_name=self.table_name,
+                    amount_to_withdraw=amount_to_withdraw,
+                    amount_to_receive=amount_to_receive,
+                )
+                self.cursor.execute(script, (user_id,))
+            elif to_currency == 'USD':
+                amount_to_withdraw = round(
+                    amount_to_receive * exchange_rate.euro_to_usd, 2
+                )
+                script = cmds.UPDATE_BALANCE_EUR_TO_USD.format(
+                    table_name=self.table_name,
+                    amount_to_withdraw=amount_to_withdraw,
+                    amount_to_receive=amount_to_receive,
+                )
+                self.cursor.execute(script, (user_id,))
+        else:
+            print('Неверная валюта')
             return
 
-        try:
-            if from_currency == 'RUB':
-                if to_currency == 'USD':
-                    amount_to_withdraw = round(
-                        amount_to_receive * exchange_rate.usd_to_rub, 2
-                    )
-                    script = cmds.UPDATE_BALANCE_RUB_TO_USD.format(
-                        table_name=self.table_name,
-                        amount_to_withdraw=amount_to_withdraw,
-                        amount_to_receive=amount_to_receive,
-                    )
-                    self.cursor.execute(script, (user_id,))
-                elif to_currency == 'EUR':
-                    amount_to_withdraw = round(
-                        amount_to_receive * exchange_rate.euro_to_rub, 2
-                    )
-                    script = cmds.UPDATE_BALANCE_RUB_TO_EURO.format(
-                        table_name=self.table_name,
-                        amount_to_withdraw=amount_to_withdraw,
-                        amount_to_receive=amount_to_receive,
-                    )
-                    self.cursor.execute(script, (user_id,))
-
-            elif from_currency == 'USD':
-                if to_currency == 'RUB':
-                    amount_to_withdraw = round(
-                        amount_to_receive / exchange_rate.usd_to_rub, 2
-                    )
-                    script = cmds.UPDATE_BALANCE_USD_TO_RUB.format(
-                        table_name=self.table_name,
-                        amount_to_withdraw=amount_to_withdraw,
-                        amount_to_receive=amount_to_receive,
-                    )
-                    self.cursor.execute(script, (user_id,))
-                elif to_currency == 'EUR':
-                    amount_to_withdraw = round(
-                        amount_to_receive * exchange_rate.usd_to_euro, 2
-                    )
-                    script = cmds.UPDATE_BALANCE_USD_TO_EUR.format(
-                        table_name=self.table_name,
-                        amount_to_withdraw=amount_to_withdraw,
-                        amount_to_receive=amount_to_receive,
-                    )
-                    self.cursor.execute(script, (user_id,))
-
-            elif from_currency == 'EUR':
-                if to_currency == 'RUB':
-                    amount_to_withdraw = round(
-                        amount_to_receive / exchange_rate.euro_to_rub, 2
-                    )
-                    script = cmds.UPDATE_BALANCE_EUR_TO_RUB.format(
-                        table_name=self.table_name,
-                        amount_to_withdraw=amount_to_withdraw,
-                        amount_to_receive=amount_to_receive,
-                    )
-                    self.cursor.execute(script, (user_id,))
-                elif to_currency == 'USD':
-                    amount_to_withdraw = round(
-                        amount_to_receive * exchange_rate.euro_to_usd, 2
-                    )
-                    script = cmds.UPDATE_BALANCE_EUR_TO_USD.format(
-                        table_name=self.table_name,
-                        amount_to_withdraw=amount_to_withdraw,
-                        amount_to_receive=amount_to_receive,
-                    )
-                    self.cursor.execute(script, (user_id,))
-            else:
-                print('Неверная валюта')
-                return
-
-            print(f'Обмен валюты успешно завершен')
-        except Exception as e:
-            self.db.rollback()  # Отменить изменения при ошибке
-            print(f'Ошибка при обмене валюты: {e}')
+        print(f'Обмен валюты успешно завершен')
