@@ -1,4 +1,3 @@
-from enum import StrEnum
 from registration_db.enums import OperationChoice
 from registration_db.sql_queries import UserManager
 

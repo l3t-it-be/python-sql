@@ -58,159 +58,128 @@ class UserManager:
         except OperationalError as e:
             print(f'Ошибка при добавлении пользователя: {e}')
 
+    @staticmethod
+    def yes_or_no() -> None:
+        while True:
+            choice = input('Хотите продолжить? (Да/Нет): ').strip().lower()
+            if choice == 'да':
+                break
+            elif choice == 'нет':
+                print('Выход из программы')
+                exit()
+            else:
+                print('Неверный выбор. Пожалуйста, введите "да" или "нет".')
+
     def register_new_user(self) -> None:
         """Регистрация нового пользователя"""
         while True:
             login = input('Введите логин: ')
+            if not login.strip():
+                print('Логин не может быть пустым')
+                self.yes_or_no()
+                continue
 
             if not self.is_login_unique(login):
                 print(f'Логин {login} уже занят. Попробуйте другой.')
-                while True:
-                    choice = (
-                        input('Хотите продолжить? (Да/Нет): ').strip().lower()
-                    )
-                    if choice == 'да':
-                        return
-                    elif choice == 'нет':
-                        print('Выход из программы')
-                        exit()
-                    else:
-                        print(
-                            'Неверный выбор. Пожалуйста, введите "да" или "нет".'
-                        )
-                        continue
-
-            if not login.strip():
-                print('Логин не может быть пустым')
-                while True:
-                    choice = (
-                        input('Хотите продолжить? (Да/Нет): ').strip().lower()
-                    )
-                    if choice == 'да':
-                        return
-                    elif choice == 'нет':
-                        print('Выход из программы')
-                        exit()
-                    else:
-                        print(
-                            'Неверный выбор. Пожалуйста, введите "да" или "нет".'
-                        )
-                        continue
-
-            password = input('Введите пароль: ')
-            if not password.strip():
-                print('Пароль не может быть пустым')
-                while True:
-                    choice = (
-                        input('Хотите продолжить? (Да/Нет): ').strip().lower()
-                    )
-                    if choice == 'да':
-                        return
-                    elif choice == 'нет':
-                        print('Выход из программы')
-                        exit()
-                    else:
-                        print(
-                            'Неверный выбор. Пожалуйста, введите "да" или "нет".'
-                        )
-                        continue
+                self.yes_or_no()
+                continue
 
             while True:
-                code = input('Введите 4-х значный код для восстановления: ')
-                if len(code) == 4 and code.isdigit():
-                    break
-                print('Неверный код. Нужно ввести 4-х значное целое число')
+                password = input('Введите пароль: ')
+                if not password.strip():
+                    print('Пароль не может быть пустым')
+                    self.yes_or_no()
+                    continue
 
-            try:
-                self.add_new_user(login, password, code)
-                break
-            except OperationalError as e:
-                print(f'Ошибка при регистрации пользователя: {e}')
+                while True:
+                    code = input(
+                        'Введите 4-х значный код для восстановления: '
+                    )
+                    if len(code) != 4 or not code.isdigit():
+                        print(
+                            'Неверный код. Нужно ввести 4-х значное целое число'
+                        )
+                        self.yes_or_no()
+                        continue
+
+                    try:
+                        self.add_new_user(login, password, code)
+                        return
+                    except OperationalError as e:
+                        print(f'Ошибка при регистрации пользователя: {e}')
+                        continue
 
     def reset_password(self) -> None:
         """Восстановление пароля"""
-        login = input('Введите ваш логин: ')
-        if not login.strip():
-            print('Логин не может быть пустым')
-            while True:
-                choice = input('Хотите продолжить? (Да/Нет): ').strip().lower()
-                if choice == 'да':
-                    return
-                elif choice == 'нет':
-                    print('Выход из программы')
-                    exit()
-                else:
-                    print(
-                        'Неверный выбор. Пожалуйста, введите "да" или "нет".'
-                    )
-                    continue
+        while True:
+            login = input('Введите логин: ')
+            if not login.strip():
+                print('Логин не может быть пустым')
+                self.yes_or_no()
+                continue
 
-        script = cmds.ASSERT_LOGIN_IN_SYSTEM.format(table_name=self.table_name)
-        self.cursor.execute(script, (login.lower(),))
-        user = self.cursor.fetchone()
-
-        if user:
-            code = input('Введите ваш код восстановления: ')
-            script = cmds.ASSERT_LOGIN_MATCHES_CODE.format(
+            script = cmds.ASSERT_LOGIN_IN_SYSTEM.format(
                 table_name=self.table_name
             )
-            self.cursor.execute(script, (login.lower(), code))
-            user_code_match = self.cursor.fetchone()
+            self.cursor.execute(script, (login.lower(),))
+            user = self.cursor.fetchone()
 
-            if user_code_match:
+            if user:
                 while True:
-                    new_password = input('Введите новый пароль: ')
-                    if not new_password.strip():
-                        print('Пароль не может быть пустым')
+                    code = input('Введите ваш код для восстановления: ')
+                    if len(code) != 4 or not code.isdigit():
+                        print(
+                            'Неверный код. Нужно ввести 4-х значное целое число'
+                        )
+                        self.yes_or_no()
+                        continue
+
+                    script = cmds.ASSERT_LOGIN_MATCHES_CODE.format(
+                        table_name=self.table_name
+                    )
+                    self.cursor.execute(script, (login.lower(), code))
+                    user_code_match = self.cursor.fetchone()
+
+                    if user_code_match:
                         while True:
-                            choice = (
-                                input('Хотите продолжить? (Да/Нет): ')
-                                .strip()
-                                .lower()
-                            )
-                            if choice == 'да':
-                                return
-                            elif choice == 'нет':
-                                print('Выход из программы')
-                                exit()
-                            else:
-                                print(
-                                    'Неверный выбор. Пожалуйста, введите "да" или "нет".'
-                                )
+                            new_password = input('Введите новый пароль: ')
+                            if not new_password.strip():
+                                print('Пароль не может быть пустым')
+                                self.yes_or_no()
                                 continue
 
-                    try:
-                        script = cmds.UPDATE_PASSWORD.format(
-                            table_name=self.table_name
-                        )
-                        self.cursor.execute(
-                            script, (new_password, login.lower())
-                        )
-                        print('Пароль успешно изменен')
-                        break
-                    except OperationalError as e:
-                        print(f'Ошибка подключения к базе данных: {e}')
+                            try:
+                                script = cmds.UPDATE_PASSWORD.format(
+                                    table_name=self.table_name
+                                )
+                                self.cursor.execute(
+                                    script, (new_password, login.lower())
+                                )
+                                print('Пароль успешно изменен')
+                                return  # Завершение выполнения метода после успешной смены пароля
+                            except OperationalError as e:
+                                print(f'Ошибка подключения к базе данных: {e}')
+                    else:
+                        print('Неверный код восстановления')
             else:
-                print('Неверный код восстановления')
-        else:
-            print('Пользователь не найден')
-            while True:
-                choice = (
-                    input('Хотите зарегистрироваться? (Да/Нет): ')
-                    .strip()
-                    .lower()
-                )
-                if choice == 'да':
-                    self.register_new_user()
-                    return
-                elif choice == 'нет':
-                    print('Выход из программы')
-                    exit()
-                else:
-                    print(
-                        'Неверный выбор. Пожалуйста, введите "да" или "нет".'
+                print('Пользователь не найден')
+                while True:
+                    choice = (
+                        input('Хотите зарегистрироваться? (Да/Нет): ')
+                        .strip()
+                        .lower()
                     )
-                    continue
+                    if choice == 'да':
+                        self.register_new_user()
+                        break
+                    elif choice == 'нет':
+                        print('Выход из программы')
+                        exit()
+                    else:
+                        print(
+                            'Неверный выбор. Пожалуйста, введите "да" или "нет".'
+                        )
+                        continue
 
     def authorize_user(self) -> None:
         """Авторизация пользователя"""
@@ -218,47 +187,22 @@ class UserManager:
             login = input('Введите логин: ')
             if not login.strip():
                 print('Логин не может быть пустым')
-                while True:
-                    choice = (
-                        input('Хотите продолжить? (Да/Нет): ').strip().lower()
-                    )
-                    if choice == 'да':
-                        return
-                    elif choice == 'нет':
-                        print('Выход из программы')
-                        exit()
-                    else:
-                        print(
-                            'Неверный выбор. Пожалуйста, введите "да" или "нет".'
-                        )
-                        continue
+                self.yes_or_no()
+                continue
 
             script = cmds.ASSERT_LOGIN_IN_SYSTEM.format(
                 table_name=self.table_name
             )
             self.cursor.execute(script, (login.lower(),))
             user = self.cursor.fetchone()
+
             if user:
                 while True:
                     password = input('Введите пароль: ')
                     if not password.strip():
                         print('Пароль не может быть пустым')
-                        while True:
-                            choice = (
-                                input('Хотите продолжить? (Да/Нет): ')
-                                .strip()
-                                .lower()
-                            )
-                            if choice == 'да':
-                                return
-                            elif choice == 'нет':
-                                print('Выход из программы')
-                                exit()
-                            else:
-                                print(
-                                    'Неверный выбор. Пожалуйста, введите "да" или "нет".'
-                                )
-                                continue
+                        self.yes_or_no()
+                        continue
 
                     if user[1] == password:
                         print('Вы успешно авторизованы')
@@ -273,7 +217,7 @@ class UserManager:
                             )
                             if choice == 'да':
                                 self.reset_password()
-                                return
+                                break
                             elif choice == 'нет':
                                 print('Выход из программы')
                                 exit()
@@ -292,7 +236,7 @@ class UserManager:
                     )
                     if choice == 'да':
                         self.register_new_user()
-                        return
+                        break
                     elif choice == 'нет':
                         print('Выход из программы')
                         exit()
