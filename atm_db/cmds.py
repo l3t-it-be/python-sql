@@ -61,3 +61,12 @@ UPDATE {table_name}
 SET Balance = Balance + {amount}
 WHERE CardNumber = ?;
 """
+
+TRANSFER_MONEY = """
+UPDATE {table_name}
+SET Balance = Balance - {amount}
+WHERE CardNumber = ?;
+UPDATE {table_name}
+SET Balance = Balance + {amount}
+WHERE CardNumber = ?;
+"""

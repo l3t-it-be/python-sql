@@ -7,4 +7,5 @@ class OperationChoice(StrEnum):
     SHOW_BALANCE = '1'
     WITHDRAW_MONEY = '2'
     DEPOSITING_MONEY = '3'
-    EXIT = '4'
+    TRANSFER_MONEY = '4'
+    EXIT = '5'

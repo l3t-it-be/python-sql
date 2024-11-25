@@ -132,7 +132,7 @@ class SQLAtm:
         else:
             print('Карта не найдена.')
 
-    def withdraw_money(self, card_number: str) -> bool:
+    def withdraw_money(self, card_number: str) -> bool | str:
         """Снятие денежных средств с карты"""
         while True:
             try:
@@ -160,15 +160,15 @@ class SQLAtm:
                     table_name=self.table_name, amount=amount
                 )
                 self.cursor.execute(script, (card_number,))
+
             except OperationalError as e:
                 print(f'Ошибка при списании денежных средств: {e}')
 
         self.show_balance(card_number)
-        return True
+        return amount
 
-    """Внесение денежных средств на карту"""
-
-    def depositing_money(self, card_number: str) -> bool:
+    def depositing_money(self, card_number: str) -> bool | str:
+        """Внесение денежных средств на карту"""
         while True:
             try:
                 amount = input('Введите сумму, которую желаете внести: ')
@@ -190,4 +190,71 @@ class SQLAtm:
             print(f'Ошибка при пополнении денежных средств: {e}')
 
         self.show_balance(card_number)
-        return True
+        return amount
+
+    def transfer_money(
+        self, card_number: str
+    ) -> tuple[bool, None] | tuple[str, str]:
+        """Перевод денежных средств между клиентами"""
+        recipient_card_number = input('Введите номер карты получателя: ')
+
+        if card_number == recipient_card_number:
+            print(
+                'Вы указали номер собственной карты.\n'
+                'Невозможно переводить денежные средства самому себе.'
+            )
+            return False, None
+
+        script = cmds.SELECT_CARD_NUMBER_AND_IsBlocked.format(
+            table_name=self.table_name
+        )
+        self.cursor.execute(script, (recipient_card_number,))
+
+        result = self.cursor.fetchone()
+        if result is None:
+            print('Карта получателя не найдена.')
+            return False, None
+
+        if result[1] == 1:
+            print('Карта получателя заблокирована.')
+            return False, None
+
+        while True:
+            try:
+                amount = input('Введите сумму, которую желаете перевести: ')
+                if int(amount) <= 0:
+                    print('Некорректное значение суммы денежных средств')
+                    continue
+                else:
+                    break
+            except ValueError:
+                print('Некорректное значение')
+                return False, None
+
+        script = cmds.SHOW_BALANCE.format(table_name=self.table_name)
+        self.cursor.execute(script, (card_number,))
+
+        result = self.cursor.fetchone()
+
+        if int(amount) > result[0]:
+            print('На вашей карте недостаточно денежных средств.')
+            return False, None
+        else:
+            try:
+                # Списание денежных средств с карты отправителя
+                script = cmds.REDUCE_BALANCE.format(
+                    table_name=self.table_name, amount=amount
+                )
+                self.cursor.execute(script, (card_number,))
+
+                # Зачисление денежных средств на карту получателя
+                script = cmds.INCREASE_BALANCE.format(
+                    table_name=self.table_name, amount=amount
+                )
+                self.cursor.execute(script, (recipient_card_number,))
+            except OperationalError as e:
+                print(f'Ошибка при переводе денежных средств: {e}')
+                return False, None
+
+        self.show_balance(card_number)
+        return amount, recipient_card_number
