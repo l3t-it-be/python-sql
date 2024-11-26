@@ -1,12 +1,15 @@
+from config import ConfigStrings
 from exchanger_app.currencies_rates import exchange_rates
 from exchanger_app.operations import CurrenciesOperations
 from exchanger_app.sql_queries import DBManager, UserBalance
+
+config = ConfigStrings()
 
 
 class Exchanger:
     @staticmethod
     def exchanger_logic():
-        with DBManager() as db_manager:
+        with DBManager('users_balance') as db_manager:
             db_manager.create_table()
             user_balance = UserBalance(
                 balance_rub=100_000, balance_usd=1000, balance_euro=1000
@@ -14,19 +17,20 @@ class Exchanger:
             user_id = db_manager.add_user(user_balance)
             user_in_system = db_manager.is_user_in_system(user_id)
             if not user_in_system:
-                print(
-                    'Вы не зарегистрированы в нашей системе. '
-                    'Пожалуйста, обратитесь в банк.'
-                )
+                print(config.NOT_REGISTERED)
                 return
             else:
                 db_manager.show_balance(user_id)
 
             operations = CurrenciesOperations()
             while True:
-                to_currency = operations.get_currency_from_user('get')
+                to_currency = operations.get_currency_from_user(
+                    config.GET_OPERATION
+                )
                 amount_to_receive = operations.get_money_amount()
-                from_currency = operations.get_currency_from_user('give')
+                from_currency = operations.get_currency_from_user(
+                    config.GIVE_OPERATION
+                )
 
                 enough_money = db_manager.check_balance(
                     user_id,
@@ -37,10 +41,10 @@ class Exchanger:
                 )
 
                 if from_currency == to_currency:
-                    print('Невозможно производить обмен двух одинаковых валют')
+                    print(config.SAME_CURRENCY)
                     continue
                 elif not enough_money:
-                    print('Недостаточно средств на балансе')
+                    print(config.NOT_ENOUGH_MONEY)
                     operations.make_choice()
                     continue
 

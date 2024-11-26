@@ -1,4 +1,7 @@
+from config import ConfigStrings
 from exchanger_app.enums import OperationChoice
+
+config = ConfigStrings()
 
 
 class CurrenciesOperations:
@@ -7,35 +10,23 @@ class CurrenciesOperations:
         """Запрос валют, которые пользователь хочет обменять"""
         currency = None
         while True:
-            if action == 'get':
-                print(
-                    'Введите какую валюту желаете получить: \n'
-                    '1. RUB\n'
-                    '2. USD\n'
-                    '3. EUR\n'
-                    '4. Выход из сервиса'
-                )
-            elif action == 'give':
-                print(
-                    'Какую валюту готовы предложить взамен? \n'
-                    '1. RUB\n'
-                    '2. USD\n'
-                    '3. EUR\n'
-                    '4. Выход из сервиса'
-                )
+            if action == config.GET_OPERATION:
+                print(config.TO_CURRENCY)
+            elif action == config.GIVE_OPERATION:
+                print(config.FROM_CURRENCY)
 
-            currency_choice = input('Введите номер валюты: ')
+            currency_choice = input(config.INPUT_CURRENCY_NUMBER)
             if currency_choice == OperationChoice.RUB:
-                currency = 'RUB'
+                currency = config.RUB
             elif currency_choice == OperationChoice.USD:
-                currency = 'USD'
+                currency = config.USD
             elif currency_choice == OperationChoice.EURO:
-                currency = 'EUR'
+                currency = config.EURO
             elif currency_choice == OperationChoice.EXIT:
-                print('До свидания!')
+                print(config.MSG_GOODBYE)
                 exit()
             else:
-                print('Неверный выбор номера валюты.')
+                print(config.INCORRECT_CURRENCY_NUMBER)
                 continue
 
             if currency is not None:
@@ -48,33 +39,25 @@ class CurrenciesOperations:
         """Запрос денежной суммы, которую хочет получить пользователь"""
         while True:
             try:
-                amount = float(input('Какая сумма Вас интересует?\n'))
+                amount = float(input(config.HOW_MUCH))
                 if amount <= 0:  # Проверка на отрицательную или нулевую сумму
-                    print(
-                        'Невозможно обменивать нулевую или отрицательную сумму'
-                    )
+                    print(config.NULL_OR_NEGATIVE_SUM)
                     continue
                 else:
                     return amount
             except ValueError:
-                print('Введите числовое значение')
+                print(config.INPUT_NUMBER)
                 continue
 
     @staticmethod
     def make_choice() -> None:
         """Выбор действия при недостаточном балансе"""
         while True:
-            choice = (
-                input(
-                    'Хотите ввести другую сумму или покинуть сервис? (П - Продолжить/В - Выйти): '
-                )
-                .strip()
-                .lower()
-            )
-            if choice == 'в':
-                print('До свидания!')
+            choice = input(config.OTHER_SUM_OR_LEAVE).strip().lower()
+            if choice == config.LEAVE:
+                print(config.MSG_GOODBYE)
                 exit()
-            elif choice == 'п':
+            elif choice == config.GO_ON:
                 break
             else:
-                print('Некорректный выбор. Пожалуйста, введите "П" или "В"')
+                print(config.INCORRECT_CHOICE_GO_ON_OR_LEAVE)

@@ -15,7 +15,7 @@ class Operation:
             print(config.RESET_PASSWORD)
             print(config.EXIT)
 
-            choice = input(config.INPUT_NUMBER)
+            choice = input(config.INPUT_OPERATION_NUMBER)
 
             with UserManager('users_data') as user:
                 if choice == OperationChoice.REGISTER_NEW_USER:

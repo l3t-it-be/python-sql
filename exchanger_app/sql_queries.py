@@ -1,10 +1,12 @@
-import sqlite3
 from dataclasses import dataclass
-from sqlite3 import Connection, Cursor, OperationalError
-from typing import Self
+from sqlite3 import OperationalError
 
+from config import ConfigStrings
 from exchanger_app import cmds
 from exchanger_app.currencies_rates import ExchangeRate
+from initialize_bd import Initialization
+
+config = ConfigStrings
 
 
 @dataclass(kw_only=True)
@@ -14,21 +16,10 @@ class UserBalance:
     balance_euro: float
 
 
-class DBManager:
-    def __init__(self):
-        self.db_name: str = 'exchanger.db'
-        self.table_name: str = 'users_balance'
-        self.db: Connection | None = None
-        self.cursor: Cursor | None = None
-
-    def __enter__(self) -> Self:
-        self.db = sqlite3.connect(self.db_name, autocommit=True)
-        self.cursor = self.db.cursor()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.db is not None:
-            self.db.close()
+class DBManager(Initialization):
+    def __init__(self, table_name: str):
+        super().__init__(table_name)
+        self.table_name = 'users_balance'
 
     def create_table(self) -> None:
         """Создание таблицы"""
@@ -37,8 +28,8 @@ class DBManager:
         )
         try:
             self.cursor.execute(script)
-        except OperationalError as e:
-            print(f'Ошибка при создании таблицы: {e}')
+        except OperationalError:
+            print(config.DATABASE_CONNECTION_ERROR)
 
     def add_user(self, user_balance: UserBalance) -> int:
         """Добавление в таблицу пользователя"""
@@ -52,8 +43,8 @@ class DBManager:
                     user_balance.balance_euro,
                 ),
             )
-        except OperationalError as e:
-            print(f'Ошибка при добавлении пользователя: {e}')
+        except OperationalError:
+            print(config.DATABASE_CONNECTION_ERROR)
         user_id = self.cursor.lastrowid
         return user_id
 
@@ -154,7 +145,7 @@ class DBManager:
     ) -> None:
         """Обмен валют"""
         if amount_to_receive <= 0:
-            print('Нельзя обменивать нулевую или отрицательную сумму.')
+            print(config.NULL_OR_NEGATIVE_SUM)
             return
 
         if from_currency == 'RUB':
@@ -223,7 +214,7 @@ class DBManager:
                 )
                 self.cursor.execute(script, (user_id,))
         else:
-            print('Неверная валюта')
+            print(config.INCORRECT_CURRENCY)
             return
 
-        print(f'Обмен валюты успешно завершен')
+        print(config.CURRENCY_EXCHANGE_SUCCESSFULLY_COMPLETED)

@@ -18,7 +18,8 @@ VALUES
 ASSERT_USER_IN_SYSTEM = """
 SELECT 1 
 FROM {table_name} 
-WHERE UserID = ?;
+WHERE UserID = ?
+LIMIT 1;
 """
 
 SHOW_BALANCE = """
