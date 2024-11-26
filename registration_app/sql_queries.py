@@ -30,7 +30,7 @@ class UserManager(Initialization):
         self.cursor.execute(script, (login.lower(),))
         existing_user = self.cursor.fetchone()
         if existing_user:
-            print(config.LOGIN_ALREADY_EXISTS)
+            print(login, config.LOGIN_ALREADY_EXISTS)
             return False
         return True
 
@@ -48,7 +48,7 @@ class UserManager(Initialization):
         script = cmds.ADD_NEW_USER.format(table_name=self.table_name)
         try:
             self.cursor.execute(script, (login, password, code))
-            print(config.SUCCESSFUL_REGISTRATION + login)
+            print(config.SUCCESSFUL_REGISTRATION, login)
         except OperationalError:
             print(config.DATABASE_CONNECTION_ERROR)
 

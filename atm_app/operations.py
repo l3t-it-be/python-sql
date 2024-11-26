@@ -2,8 +2,11 @@ import csv
 import os
 from datetime import datetime
 
+from config import ConfigStrings
 from sql_queries import SQLAtm
 from enums import OperationChoice
+
+config = ConfigStrings
 
 
 class Operation:
@@ -16,14 +19,14 @@ class Operation:
         | tuple[str, tuple[bool, None] | tuple[str, str]]
     ):
         """Выбор операции"""
-        with SQLAtm() as atm:
+        with SQLAtm('atm_data') as atm:
             while True:
-                print('Выберите действие:')
-                print('1. Узнать баланс')
-                print('2. Снятие денежных средств')
-                print('3. Внесение денежных средств')
-                print('4. Перевести денежные средства')
-                print('5. Завершить работу')
+                print(config.CHOOSE_ACTION)
+                print(config.SHOW_BALANCE_1)
+                print(config.WITHDRAW_MONEY_2)
+                print(config.DEPOSITING_MONEY_3)
+                print(config.TRANSFER_MONEY_4)
+                print(config.EXIT_5)
 
                 choice = input('Введите номер операции: ')
                 if choice == OperationChoice.SHOW_BALANCE:
@@ -39,10 +42,10 @@ class Operation:
                     data = atm.transfer_money(card_number)
                     return choice, data
                 elif choice == OperationChoice.EXIT:
-                    print('До свидания! Всего вам доброго!')
+                    print(config.MSG_GOODBYE)
                     exit()
                 else:
-                    print('Некорректный выбор операции')
+                    print(config.INCORRECT_OPERATION_CHOICE)
 
     @staticmethod
     def create_csv(filename: str) -> None:
@@ -57,7 +60,7 @@ class Operation:
 
             writer = csv.writer(csvfile, delimiter=';')
             writer.writerows(data)
-        print(f'Создан файл {filename} для отчетов о финансовых операциях')
+        print(config.FILE_FOR_REPORTS_CREATED, filename)
 
     def report_operation(
         self,
@@ -69,19 +72,17 @@ class Operation:
     ) -> None:
         """Запись данных в файл для отчета"""
         if amount is False:
-            print(
-                'Операция не была выполнена. Запись в отчет не производится.'
-            )
+            print(config.OPERATION_WAS_NOT_PERFORMED)
             return
 
         current_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         user_data = []
 
-        if filename == 'report_1.csv':
+        if filename == config.FILE_FOR_REPORTS_1:
             user_data = [
                 (current_date, card_number1, current_operation, amount)
             ]
-        elif filename == 'report_2.csv':
+        elif filename == config.FILE_FOR_REPORTS_2:
             user_data = [
                 (
                     current_date,
@@ -100,4 +101,4 @@ class Operation:
             writer = csv.writer(csvfile, delimiter=';')
             writer.writerows(user_data)
 
-        print('Данные внесены в отчет')
+        print(config.DATA_REPORTED)

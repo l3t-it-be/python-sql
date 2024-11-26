@@ -81,8 +81,8 @@ class DBManager(Initialization):
         self.cursor.execute(script, (user_id,))
         balance = self.cursor.fetchone()
 
-        if from_currency == 'RUB':
-            if to_currency == 'USD':
+        if from_currency == config.RUB:
+            if to_currency == config.USD:
                 amount_to_withdraw = round(
                     amount_to_receive * exchange_rate.usd_to_rub, 2
                 )
@@ -90,7 +90,7 @@ class DBManager(Initialization):
                     balance[0] >= amount_to_withdraw
                     and balance[1] >= amount_to_receive
                 )
-            elif to_currency == 'EUR':
+            elif to_currency == config.EURO:
                 amount_to_withdraw = round(
                     amount_to_receive * exchange_rate.euro_to_rub, 2
                 )
@@ -98,8 +98,8 @@ class DBManager(Initialization):
                     balance[0] >= amount_to_withdraw
                     and balance[2] >= amount_to_receive
                 )
-        elif from_currency == 'USD':
-            if to_currency == 'RUB':
+        elif from_currency == config.USD:
+            if to_currency == config.RUB:
                 amount_to_withdraw = round(
                     amount_to_receive / exchange_rate.usd_to_rub, 2
                 )
@@ -107,7 +107,7 @@ class DBManager(Initialization):
                     balance[1] >= amount_to_withdraw
                     and balance[0] >= amount_to_receive
                 )
-            elif to_currency == 'EUR':
+            elif to_currency == config.EURO:
                 amount_to_withdraw = round(
                     amount_to_receive * exchange_rate.usd_to_euro, 2
                 )
@@ -115,8 +115,8 @@ class DBManager(Initialization):
                     balance[1] >= amount_to_withdraw
                     and balance[2] >= amount_to_receive
                 )
-        elif from_currency == 'EUR':
-            if to_currency == 'RUB':
+        elif from_currency == config.EURO:
+            if to_currency == config.RUB:
                 amount_to_withdraw = round(
                     amount_to_receive / exchange_rate.euro_to_rub, 2
                 )
@@ -124,7 +124,7 @@ class DBManager(Initialization):
                     balance[2] >= amount_to_withdraw
                     and balance[0] >= amount_to_receive
                 )
-            elif to_currency == 'USD':
+            elif to_currency == config.USD:
                 amount_to_withdraw = round(
                     amount_to_receive * exchange_rate.euro_to_usd, 2
                 )
@@ -148,8 +148,8 @@ class DBManager(Initialization):
             print(config.NULL_OR_NEGATIVE_SUM)
             return
 
-        if from_currency == 'RUB':
-            if to_currency == 'USD':
+        if from_currency == config.RUB:
+            if to_currency == config.USD:
                 amount_to_withdraw = round(
                     amount_to_receive * exchange_rate.usd_to_rub, 2
                 )
@@ -159,7 +159,7 @@ class DBManager(Initialization):
                     amount_to_receive=amount_to_receive,
                 )
                 self.cursor.execute(script, (user_id,))
-            elif to_currency == 'EUR':
+            elif to_currency == config.EURO:
                 amount_to_withdraw = round(
                     amount_to_receive * exchange_rate.euro_to_rub, 2
                 )
@@ -170,8 +170,8 @@ class DBManager(Initialization):
                 )
                 self.cursor.execute(script, (user_id,))
 
-        elif from_currency == 'USD':
-            if to_currency == 'RUB':
+        elif from_currency == config.USD:
+            if to_currency == config.RUB:
                 amount_to_withdraw = round(
                     amount_to_receive / exchange_rate.usd_to_rub, 2
                 )
@@ -181,7 +181,7 @@ class DBManager(Initialization):
                     amount_to_receive=amount_to_receive,
                 )
                 self.cursor.execute(script, (user_id,))
-            elif to_currency == 'EUR':
+            elif to_currency == config.EURO:
                 amount_to_withdraw = round(
                     amount_to_receive * exchange_rate.usd_to_euro, 2
                 )
@@ -192,8 +192,8 @@ class DBManager(Initialization):
                 )
                 self.cursor.execute(script, (user_id,))
 
-        elif from_currency == 'EUR':
-            if to_currency == 'RUB':
+        elif from_currency == config.EURO:
+            if to_currency == config.RUB:
                 amount_to_withdraw = round(
                     amount_to_receive / exchange_rate.euro_to_rub, 2
                 )
@@ -203,7 +203,7 @@ class DBManager(Initialization):
                     amount_to_receive=amount_to_receive,
                 )
                 self.cursor.execute(script, (user_id,))
-            elif to_currency == 'USD':
+            elif to_currency == config.USD:
                 amount_to_withdraw = round(
                     amount_to_receive * exchange_rate.euro_to_usd, 2
                 )

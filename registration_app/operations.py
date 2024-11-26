@@ -10,10 +10,10 @@ class Operation:
     def choose_operation() -> None:
         while True:
             print(config.CHOOSE_ACTION)
-            print(config.REGISTRATION)
-            print(config.AUTHORIZATION)
-            print(config.RESET_PASSWORD)
-            print(config.EXIT)
+            print(config.REGISTRATION_1)
+            print(config.AUTHORIZATION_2)
+            print(config.RESET_PASSWORD_3)
+            print(config.EXIT_4)
 
             choice = input(config.INPUT_OPERATION_NUMBER)
 

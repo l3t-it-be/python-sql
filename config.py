@@ -3,26 +3,54 @@ from sqlite3 import OperationalError as SQLError
 
 class ConfigStrings:
 
-    AUTHORIZATION = '2. Авторизация'
+    AUTHORIZATION_2 = '2. Авторизация'
+    BALANCE_MSG = 'Баланс вашей карты:'
+    CARD_BLOCKED = 'Карта заблокирована'
+    CARD_ENTERED = 'Введена карта с номером'
+    CARD_NOT_FOUND = 'Карта не найдена'
+    CARD_NUMBER_ALREADY_REGISTERED = (
+        'Пользователь с таким номером карты уже зарегистрирован в системе'
+    )
     CHOOSE_ACTION = 'Выберите действие:'
+    CORRECT_PIN_CODE_ENTERED = 'Введен верный пин-код'
     CURRENCY_EXCHANGE_SUCCESSFULLY_COMPLETED = 'Обмен валют успешно завершен'
+    DATA_REPORTED = 'Данные внесены в отчет'
     DATABASE_CONNECTION_ERROR = f'Ошибка подключения к базе данных: {SQLError}'
+    DEPOSITING_MONEY_3 = '3. Внесение денежных средств'
+
+    ENTER_PAYEE_CARD = 'Введите номер карты получателя: '
+    ENTER_SUM_TO_DEPOSIT = 'Введите сумму, которую желаете внести: '
+    ENTER_SUM_TO_TRANSFER = 'Введите сумму, которую желаете перевести: '
+    ENTER_SUM_TO_WITHDRAW = 'Введите сумму, которую желаете снять: '
+    ENTER_YOUR_CARD = 'Пожалуйста, введите номер карты: '
     EURO = 'EUR'
-    EXIT = '4. Выход'
-    FROM_CURRENCY = 'Какую валюту готовы предложить взамен? \n1. RUB\n2. USD\n3. EUR\n4. Выход из сервиса'
+    EXIT_4 = '4. Выход'
+    EXIT_5 = '5. Завершить работу'
+    FILE_FOR_REPORTS_CREATED = 'Создан файл для отчетов о финансовых операциях'
+    FILE_FOR_REPORTS_1 = 'report_1.csv'
+    FILE_FOR_REPORTS_2 = 'report_2.csv'
+    FROM_CURRENCY = (
+        'Какую валюту готовы предложить взамен? '
+        '\n1. RUB\n2. USD\n3. EUR\n4. Выход из сервиса'
+    )
     GET_OPERATION = 'get'
     GIVE_OPERATION = 'give'
     GO_ON = 'п'
+    HOW_MUCH = 'Какая сумма Вас интересует?\n'
 
     INCORRECT_CHOICE = 'Неверный выбор. Пожалуйста, введите "Да" или "Нет".'
     INCORRECT_CHOICE_GO_ON_OR_LEAVE = (
-        'Некорректный выбор. Пожалуйста, введите "П" или "В"'
+        'Некорректный выбор. Пожалуйста, введите "П" или "В".'
     )
     INCORRECT_CODE = 'Неверный код восстановления'
     INCORRECT_CURRENCY = 'Неверная валюта'
-    INCORRECT_CURRENCY_NUMBER = 'Неверный выбор номера валюты.'
+    INCORRECT_CURRENCY_NUMBER = 'Неверный выбор номера валюты'
     INCORRECT_NUMBER = 'Некорректное число'
+    INCORRECT_OPERATION_CHOICE = 'Некорректный выбор операции'
     INCORRECT_PASSWORD = 'Неверный пароль'
+    INCORRECT_PIN_CODE = 'Неверный пин-код. Осталось попыток:'
+    INCORRECT_SUM_OF_MONEY = 'Некорректное значение суммы денежных средств'
+    INCORRECT_VALUE = 'Некорректное значение'
     INPUT_CODE = 'Введите 4-х значный код для восстановления: '
     INPUT_CURRENCY_NUMBER = 'Введите номер валюты: '
     INPUT_LOGIN = 'Введите логин: '
@@ -39,31 +67,54 @@ class ConfigStrings:
         'Логин и пароль не могут быть пустыми'
     )
     LOGIN_SHOULD_NOT_BE_NULL = 'Логин не может быть пустым'
+    MSG_ENTER_PIN_CODE = 'Введите пин-код: '
     MSG_EXIT = 'Выход из программы'
-    MSG_GOODBYE = 'До свидания!'
+    MSG_GOODBYE = 'До свидания! Всего вам доброго!'
     NO = 'нет'
-    NOT_ENOUGH_MONEY = 'Недостаточно средств на балансе'
-    NOT_REGISTERED = 'Вы не зарегистрированы в нашей системе.\nПожалуйста, обратитесь в банк.'
+    NOT_ENOUGH_MONEY = 'На вашей карте недостаточно денежных средств'
+    NOT_REGISTERED = (
+        'Вы не зарегистрированы в нашей системе.\n'
+        'Пожалуйста, обратитесь в банк.'
+    )
     NULL_OR_NEGATIVE_SUM = (
         'Невозможно обменивать нулевую или отрицательную сумму'
     )
 
-    OTHER_SUM_OR_LEAVE = 'Хотите ввести другую сумму или покинуть сервис? (П - Продолжить/В - Выйти): '
+    OPERATION_CAN_NOT_BE_PERFORMED = 'Операция не может быть выполнена'
+    OPERATION_WAS_NOT_PERFORMED = (
+        'Операция не была выполнена. ' 'Запись в отчет не производится.'
+    )
+    OTHER_SUM_OR_LEAVE = (
+        'Хотите ввести другую сумму или покинуть сервис? '
+        '(П - Продолжить/В - Выйти): '
+    )
     PASSWORD_SHOULD_NOT_BE_NULL = 'Пароль не может быть пустым'
     PASSWORD_SUCCESSFULLY_CHANGED = 'Пароль успешно изменен'
-    REGISTRATION = '1. Регистрация'
-    RESET_PASSWORD = '3. Восстановление пароля'
+    PAYEE_CARD_BLOCKED = 'Карта получателя заблокирована'
+    PAYEE_CARD_NOT_FOUND = 'Карта получателя не найдена'
+    REGISTRATION_1 = '1. Регистрация'
+    RESET_PASSWORD_3 = '3. Восстановление пароля'
     RUB = 'RUB'
-    SAME_CURRENCY = 'Невозможно производить обмен двух одинаковых валют'
-    SUCCESSFUL_REGISTRATION = (
-        'Пользователь успешно зарегистрирован. Ваш логин: '
+    SAME_CARD = (
+        'Вы указали номер собственной карты.\n'
+        'Невозможно переводить денежные средства самому себе.'
     )
+    SAME_CURRENCY = 'Невозможно производить обмен двух одинаковых валют'
+    SHOW_BALANCE_1 = '1. Узнать баланс'
+    SUCCESSFUL_REGISTRATION = 'Пользователь успешно зарегистрирован. Логин:'
     SUCCESSFULLY_AUTHORIZED = 'Вы успешно авторизованы'
-    TO_CURRENCY = 'Введите какую валюту желаете получить: \n1. RUB\n2. USD\n3. EUR\n4. Выход из сервиса'
+    TO_CURRENCY = (
+        'Введите какую валюту желаете получить: '
+        '\n1. RUB\n2. USD\n3. EUR\n4. Выход из сервиса'
+    )
+    TRANSFER_MONEY_4 = '4. Перевести денежные средства'
 
+    UNKNOWN_CARD_NUMBER = (
+        'Введен неизвестный номер карты. Пожалуйста, обратитесь в банк.'
+    )
     USER_NOT_FOUND = 'Пользователь не найден'
     USD = 'USD'
-    HOW_MUCH = 'Какая сумма Вас интересует?\n'
+    WITHDRAW_MONEY_2 = '2. Снятие денежных средств'
     WISH_TO_CONTINUE = 'Хотите продолжить? (Да/Нет): '
     WISH_TO_REGISTER = 'Хотите зарегистрироваться? (Да/Нет): '
     WISH_TO_RESET_PASSWORD = 'Хотите восстановить пароль? (Да/Нет): '

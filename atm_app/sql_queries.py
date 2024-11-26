@@ -1,9 +1,11 @@
-import sqlite3
 from dataclasses import dataclass
-from sqlite3 import OperationalError, Connection, Cursor
-from typing import Self
+from sqlite3 import OperationalError
 
-import cmds
+from atm_app import cmds
+from config import ConfigStrings
+from initialize_bd import Initialization
+
+config = ConfigStrings()
 
 
 @dataclass(kw_only=True)
@@ -13,21 +15,10 @@ class UserData:
     balance: int
 
 
-class SQLAtm:
-    def __init__(self):
-        self.db_name: str = 'atm.db'
-        self.table_name: str = 'users_data'
-        self.db: Connection | None = None
-        self.cursor: Cursor | None = None
-
-    def __enter__(self) -> Self:
-        self.db = sqlite3.connect(self.db_name, autocommit=True)
-        self.cursor = self.db.cursor()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.db is not None:
-            self.db.close()
+class SQLAtm(Initialization):
+    def __init__(self, table_name: str):
+        super().__init__(table_name)
+        self.table_name: str = 'atm_data'
 
     def create_table(self) -> None:
         """Создание таблицы"""
@@ -36,8 +27,8 @@ class SQLAtm:
         )
         try:
             self.cursor.execute(script)
-        except OperationalError as e:
-            print(f'Ошибка при создании таблицы: {e}')
+        except OperationalError:
+            print(config.DATABASE_CONNECTION_ERROR)
 
     def add_new_user(self, users_data: UserData) -> None:
         """Добавление в таблицу пользователя (если такого еще нет)"""
@@ -48,10 +39,8 @@ class SQLAtm:
 
         user = self.cursor.fetchone()
         if user is None:
+            script = cmds.INSERT_USERS_DATA.format(table_name=self.table_name)
             try:
-                script = cmds.INSERT_USERS_DATA.format(
-                    table_name=self.table_name
-                )
                 self.cursor.execute(
                     script,
                     (
@@ -60,27 +49,23 @@ class SQLAtm:
                         users_data.balance,
                     ),
                 )
-            except OperationalError as e:
-                print(f'Ошибка при добавлении пользователя: {e}')
+            except OperationalError:
+                print(config.DATABASE_CONNECTION_ERROR)
             else:
-                print(
-                    'Пользователь с таким номером карты уже зарегистрирован в системе'
-                )
+                print(config.CARD_NUMBER_ALREADY_REGISTERED)
 
     def check_result(self, card_number: str) -> bool:
         """Проверка номера введенной карты"""
         result = self.cursor.fetchone()
         if result is None:
-            print(
-                'Введен неизвестный номер карты. Пожалуйста, обратитесь в банк.'
-            )
+            print(config.UNKNOWN_CARD_NUMBER)
             return False
 
         if result[1] == 1:
-            print('Карта заблокирована')
+            print(config.CARD_BLOCKED)
             return False
 
-        print(f'Введена карта с номером {card_number}')
+        print(config.CARD_ENTERED, card_number)
         return True
 
     def insert_card(self, card_number: str) -> bool:
@@ -96,29 +81,29 @@ class SQLAtm:
         """Проверка пин-кода"""
         attempts = 3
         while attempts > 0:
-            pin_code = input('Введите пин-код: ')
+            pin_code = input(config.MSG_ENTER_PIN_CODE)
             script = cmds.SELECT_PIN_CODE.format(table_name=self.table_name)
             self.cursor.execute(script, (card_number,))
 
             result = self.cursor.fetchone()
             try:
                 if int(pin_code) == result[0]:
-                    print('Введен верный пин-код')
+                    print(config.CORRECT_PIN_CODE_ENTERED)
                     return True
                 else:
                     attempts -= 1
-                    print(f'Неверный пин-код. Осталось попыток: {attempts}')
+                    print(config.INCORRECT_PIN_CODE, attempts)
             except ValueError:
                 attempts -= 1
-                print(f'Неверный пин-код. Осталось попыток: {attempts}')
+                print(config.INCORRECT_PIN_CODE, attempts)
 
         # Блокировка карты после трех неудачных попыток
+        script = cmds.BLOCK_CARD_NUMBER.format(table_name=self.table_name)
         try:
-            script = cmds.BLOCK_CARD_NUMBER.format(table_name=self.table_name)
             self.cursor.execute(script, (card_number,))
-        except OperationalError as e:
-            print(f'Ошибка при блокировке карты: {e}')
-        print('Карта заблокирована')
+        except OperationalError:
+            print(config.DATABASE_CONNECTION_ERROR)
+        print(config.CARD_BLOCKED)
         return False
 
     def show_balance(self, card_number: str) -> None:
@@ -128,22 +113,22 @@ class SQLAtm:
 
         result = self.cursor.fetchone()
         if result is not None:
-            print(f'Баланс вашей карты: {result[0]} руб.')
+            print(config.BALANCE_MSG, f'{result[0]} руб.')
         else:
-            print('Карта не найдена.')
+            print(config.CARD_NOT_FOUND)
 
     def withdraw_money(self, card_number: str) -> bool | str:
         """Снятие денежных средств с карты"""
         while True:
             try:
-                amount = input('Введите сумму, которую желаете снять: ')
+                amount = input(config.ENTER_SUM_TO_WITHDRAW)
                 if int(amount) <= 0:
-                    print('Некорректное значение суммы денежных средств')
+                    print(config.INCORRECT_SUM_OF_MONEY)
                     continue
                 else:
                     break
             except ValueError:
-                print('Некорректное значение')
+                print(config.INCORRECT_VALUE)
                 return False
 
         script = cmds.SHOW_BALANCE.format(table_name=self.table_name)
@@ -152,17 +137,16 @@ class SQLAtm:
         result = self.cursor.fetchone()
 
         if int(amount) > result[0]:
-            print('На вашей карте недостаточно денежных средств')
+            print(config.NOT_ENOUGH_MONEY)
             return False
         else:
+            script = cmds.REDUCE_BALANCE.format(
+                table_name=self.table_name, amount=amount
+            )
             try:
-                script = cmds.REDUCE_BALANCE.format(
-                    table_name=self.table_name, amount=amount
-                )
                 self.cursor.execute(script, (card_number,))
-
-            except OperationalError as e:
-                print(f'Ошибка при списании денежных средств: {e}')
+            except OperationalError:
+                print(config.DATABASE_CONNECTION_ERROR)
 
         self.show_balance(card_number)
         return amount
@@ -171,23 +155,23 @@ class SQLAtm:
         """Внесение денежных средств на карту"""
         while True:
             try:
-                amount = input('Введите сумму, которую желаете внести: ')
+                amount = input(config.ENTER_SUM_TO_DEPOSIT)
                 if int(amount) <= 0:
-                    print('Некорректное значение суммы денежных средств')
+                    print(config.INCORRECT_SUM_OF_MONEY)
                     continue
                 else:
                     break
             except ValueError:
-                print('Некорректное значение')
+                print(config.INCORRECT_VALUE)
                 return False
 
+        script = cmds.INCREASE_BALANCE.format(
+            table_name=self.table_name, amount=amount
+        )
         try:
-            script = cmds.INCREASE_BALANCE.format(
-                table_name=self.table_name, amount=amount
-            )
             self.cursor.execute(script, (card_number,))
-        except OperationalError as e:
-            print(f'Ошибка при пополнении денежных средств: {e}')
+        except OperationalError:
+            print(config.DATABASE_CONNECTION_ERROR)
 
         self.show_balance(card_number)
         return amount
@@ -196,13 +180,10 @@ class SQLAtm:
         self, card_number: str
     ) -> tuple[bool, None] | tuple[str, str]:
         """Перевод денежных средств между клиентами"""
-        recipient_card_number = input('Введите номер карты получателя: ')
+        recipient_card_number = input(config.ENTER_PAYEE_CARD)
 
         if card_number == recipient_card_number:
-            print(
-                'Вы указали номер собственной карты.\n'
-                'Невозможно переводить денежные средства самому себе.'
-            )
+            print(config.SAME_CARD)
             return False, None
 
         script = cmds.SELECT_CARD_NUMBER_AND_IsBlocked.format(
@@ -212,23 +193,23 @@ class SQLAtm:
 
         result = self.cursor.fetchone()
         if result is None:
-            print('Карта получателя не найдена.')
+            print(config.PAYEE_CARD_NOT_FOUND)
             return False, None
 
         if result[1] == 1:
-            print('Карта получателя заблокирована.')
+            print(config.PAYEE_CARD_BLOCKED)
             return False, None
 
         while True:
             try:
-                amount = input('Введите сумму, которую желаете перевести: ')
+                amount = input(config.ENTER_SUM_TO_TRANSFER)
                 if int(amount) <= 0:
-                    print('Некорректное значение суммы денежных средств')
+                    print(config.INCORRECT_SUM_OF_MONEY)
                     continue
                 else:
                     break
             except ValueError:
-                print('Некорректное значение')
+                print(config.INCORRECT_VALUE)
                 return False, None
 
         script = cmds.SHOW_BALANCE.format(table_name=self.table_name)
@@ -237,7 +218,7 @@ class SQLAtm:
         result = self.cursor.fetchone()
 
         if int(amount) > result[0]:
-            print('На вашей карте недостаточно денежных средств.')
+            print(config.NOT_ENOUGH_MONEY)
             return False, None
         else:
             try:
@@ -252,8 +233,8 @@ class SQLAtm:
                     table_name=self.table_name, amount=amount
                 )
                 self.cursor.execute(script, (recipient_card_number,))
-            except OperationalError as e:
-                print(f'Ошибка при переводе денежных средств: {e}')
+            except OperationalError:
+                print(config.DATABASE_CONNECTION_ERROR)
                 return False, None
 
         self.show_balance(card_number)
