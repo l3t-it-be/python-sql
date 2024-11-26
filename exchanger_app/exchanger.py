@@ -1,6 +1,6 @@
-from exchanger_db.currencies_rates import exchange_rates
-from exchanger_db.operations import CurrenciesOperations
-from exchanger_db.sql_queries import DBManager, UserBalance
+from exchanger_app.currencies_rates import exchange_rates
+from exchanger_app.operations import CurrenciesOperations
+from exchanger_app.sql_queries import DBManager, UserBalance
 
 
 class Exchanger:

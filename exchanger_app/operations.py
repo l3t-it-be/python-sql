@@ -1,4 +1,4 @@
-from exchanger_db.enums import OperationChoice
+from exchanger_app.enums import OperationChoice
 
 
 class CurrenciesOperations:

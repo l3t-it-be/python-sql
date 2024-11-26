@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from sqlite3 import Connection, Cursor, OperationalError
 from typing import Self
 
-from exchanger_db import cmds
-from exchanger_db.currencies_rates import ExchangeRate
+from exchanger_app import cmds
+from exchanger_app.currencies_rates import ExchangeRate
 
 
 @dataclass(kw_only=True)

@@ -8,7 +8,7 @@ CREATE_TABLE_USERS_DATA = """
 """
 
 ASSERT_LOGIN_IN_SYSTEM = """
-    SELECT *
+    SELECT Login, Password
     FROM {table_name}
     WHERE LOWER(Login) = ?
     LIMIT 1;
@@ -22,7 +22,7 @@ VALUES
 """
 
 ASSERT_LOGIN_MATCHES_CODE = """
-    SELECT *
+    SELECT 1
     FROM {table_name}
     WHERE LOWER(Login) = ? AND Code = ?
     LIMIT 1;
