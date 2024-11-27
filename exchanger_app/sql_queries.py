@@ -1,12 +1,10 @@
 from dataclasses import dataclass
 from sqlite3 import OperationalError
 
-from config import ConfigStrings
+from config import config
 from exchanger_app import cmds
 from exchanger_app.currencies_rates import ExchangeRate
 from initialize_bd import Initialization
-
-config = ConfigStrings
 
 
 @dataclass(kw_only=True)
@@ -17,9 +15,8 @@ class UserBalance:
 
 
 class DBManager(Initialization):
-    def __init__(self, table_name: str):
-        super().__init__(table_name)
-        self.table_name = 'users_balance'
+    def __init__(self):
+        super().__init__('users_balance')
 
     def create_table(self) -> None:
         """Создание таблицы"""

@@ -1,15 +1,13 @@
-from config import ConfigStrings
+from config import config
 from exchanger_app.currencies_rates import exchange_rates
 from exchanger_app.operations import CurrenciesOperations
 from exchanger_app.sql_queries import DBManager, UserBalance
-
-config = ConfigStrings()
 
 
 class Exchanger:
     @staticmethod
     def exchanger_logic():
-        with DBManager('users_balance') as db_manager:
+        with DBManager() as db_manager:
             db_manager.create_table()
             user_balance = UserBalance(
                 balance_rub=100_000, balance_usd=1000, balance_euro=1000

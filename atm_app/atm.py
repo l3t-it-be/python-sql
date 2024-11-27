@@ -1,14 +1,12 @@
 from atm_app.operations import Operation
 from atm_app.sql_queries import SQLAtm, UserData
-from config import ConfigStrings
-
-config = ConfigStrings
+from config import config
 
 
 class ATM:
     @staticmethod
     def atm_logic():
-        with SQLAtm('atm_data') as atm:
+        with SQLAtm() as atm:
             atm.create_table()
             user_data1 = UserData(
                 card_number=1234, pin_code=1111, balance=10_000

@@ -5,7 +5,7 @@ from registration_app.sql_queries import UserManager
 class Registration:
     @staticmethod
     def registration_logic():
-        with UserManager('users_data') as user:
+        with UserManager() as user:
             user.create_table()
             user.add_new_user('Ivan', 'qwer1234', '1234')
             operation = Operation()

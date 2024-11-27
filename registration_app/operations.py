@@ -1,8 +1,6 @@
-from config import ConfigStrings
+from config import config
 from registration_app.enums import OperationChoice
 from registration_app.sql_queries import UserManager
-
-config = ConfigStrings()
 
 
 class Operation:
@@ -15,9 +13,9 @@ class Operation:
             print(config.RESET_PASSWORD_3)
             print(config.EXIT_4)
 
-            choice = input(config.INPUT_OPERATION_NUMBER)
+            choice = input(config.INPUT_NUMBER_OF_ACTION)
 
-            with UserManager('users_data') as user:
+            with UserManager() as user:
                 if choice == OperationChoice.REGISTER_NEW_USER:
                     user.register_new_user()
                 elif choice == OperationChoice.AUTHORIZE_USER:

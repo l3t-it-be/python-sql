@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-
 from selene import browser, query
 from selene.support.shared.jquery_style import s, ss
 from selenium import webdriver
 
 
-@dataclass()
+@dataclass
 class ExchangeRate:
     usd_to_rub: float
     euro_to_rub: float
@@ -34,11 +33,19 @@ class Currencies:
         return float(value)
 
 
-currency = Currencies()
-rates = list(
-    map(
-        currency.get_exchange_rate,
-        ['usd to rub', 'euro to rub', 'usd to euro', 'euro to usd'],
-    )
-)
-exchange_rates = ExchangeRate(*rates)
+def get_exchange_rates():
+    currency = Currencies()
+    try:
+        rates = list(
+            map(
+                currency.get_exchange_rate,
+                ['usd to rub', 'euro to rub', 'usd to euro', 'euro to usd'],
+            )
+        )
+        return ExchangeRate(*rates)
+    except Exception as error:
+        print(error)
+        return None
+
+
+exchange_rates = get_exchange_rates()

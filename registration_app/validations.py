@@ -1,9 +1,21 @@
 import re
 from typing import Callable
 
-from config import ConfigStrings
+from config import config
 
-config = ConfigStrings()
+
+def error_logger(msg: str):
+    def wrapper(func: Callable):
+        def wrapped(*args, **kwargs) -> bool:
+            """Получение результата проверки True | False"""
+            result = func(*args, **kwargs)
+            if not result:
+                print(msg)  # Если проверка не прошла - вывести сообщение
+            return result
+
+        return wrapped
+
+    return wrapper
 
 
 class Validation:
@@ -49,33 +61,26 @@ class Validation:
                 continue
 
     @staticmethod
+    @error_logger(msg=config.LOGIN_AND_PASSWORD_SHOULD_NOT_BE_EMPTY)
     def login_password_are_not_empty(login, password) -> bool:
-        if not login.strip() or not password.strip():
-            print(config.LOGIN_AND_PASSWORD_SHOULD_NOT_BE_EMPTY)
-            return False
-        return True
+        return login.strip() and password.strip()
 
+    @error_logger(msg=config.LOGIN_SHOULD_NOT_BE_NULL)
     def check_login_not_null(self, login) -> bool:
         """Проверка того, что логин не пустой"""
-        if not login.strip():
-            print(config.LOGIN_SHOULD_NOT_BE_NULL)
-            self.continue_or_not()
-            return False
-        return True
+        return bool(login.strip())
 
+    @error_logger(msg=config.PASSWORD_SHOULD_NOT_BE_NULL)
     def check_password_not_null(self, password) -> bool:
         """Проверка логина на корректность и уникальность"""
-        if not password.strip():
-            print(config.PASSWORD_SHOULD_NOT_BE_NULL)
-            self.continue_or_not()
-            return False
-        return True
+        return bool(password.strip())
 
     @staticmethod
+    @error_logger(msg=config.INVALID_CODE)
     def validate_code(code: str) -> bool:
         """Проверка соответствия переданного кода шаблону"""
         four_digits_pattern = re.compile(r'^\d{4}$')
-        if not four_digits_pattern.match(code):
-            print(config.INVALID_CODE)
-            return False
-        return True
+        return bool(four_digits_pattern.match(code))
+
+
+validation = Validation()

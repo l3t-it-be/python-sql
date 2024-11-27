@@ -2,10 +2,8 @@ from dataclasses import dataclass
 from sqlite3 import OperationalError
 
 from atm_app import cmds
-from config import ConfigStrings
+from config import config
 from initialize_bd import Initialization
-
-config = ConfigStrings()
 
 
 @dataclass(kw_only=True)
@@ -16,9 +14,8 @@ class UserData:
 
 
 class SQLAtm(Initialization):
-    def __init__(self, table_name: str):
-        super().__init__(table_name)
-        self.table_name: str = 'atm_data'
+    def __init__(self):
+        super().__init__('atm_data')
 
     def create_table(self) -> None:
         """Создание таблицы"""

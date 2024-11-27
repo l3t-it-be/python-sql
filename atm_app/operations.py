@@ -2,11 +2,9 @@ import csv
 import os
 from datetime import datetime
 
-from config import ConfigStrings
+from config import config
 from sql_queries import SQLAtm
 from enums import OperationChoice
-
-config = ConfigStrings
 
 
 class Operation:
@@ -19,7 +17,7 @@ class Operation:
         | tuple[str, tuple[bool, None] | tuple[str, str]]
     ):
         """Выбор операции"""
-        with SQLAtm('atm_data') as atm:
+        with SQLAtm() as atm:
             while True:
                 print(config.CHOOSE_ACTION)
                 print(config.SHOW_BALANCE_1)
@@ -28,7 +26,7 @@ class Operation:
                 print(config.TRANSFER_MONEY_4)
                 print(config.EXIT_5)
 
-                choice = input('Введите номер операции: ')
+                choice = input(config.INPUT_OPERATION_NUMBER)
                 if choice == OperationChoice.SHOW_BALANCE:
                     atm.show_balance(card_number)
                     return choice, None
@@ -101,4 +99,4 @@ class Operation:
             writer = csv.writer(csvfile, delimiter=';')
             writer.writerows(user_data)
 
-        print(config.DATA_REPORTED)
+        print(config.DATA_REPORTED, filename)

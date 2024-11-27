@@ -1,7 +1,5 @@
-from config import ConfigStrings
+from config import config
 from exchanger_app.enums import OperationChoice
-
-config = ConfigStrings()
 
 
 class CurrenciesOperations:

@@ -1,14 +1,17 @@
-import os
+from pathlib import Path
 import sqlite3
 from sqlite3 import Connection, Cursor
 from typing import Self
 
+BASE_DIR = Path(__file__).resolve().parent
+
 
 class Initialization:
+    """Создание БД"""
+
     def __init__(self, table_name: str):
-        self.db_name: str = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), 'PaymentSystemDB.db'
-        )
+        db_path = BASE_DIR / 'PaymentSystemDB.db'
+        self.db_name: str = db_path.as_posix()
         self.table_name: str = table_name
         self.db: Connection | None = None
         self.cursor: Cursor | None = None

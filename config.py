@@ -2,7 +2,6 @@ from sqlite3 import OperationalError as SQLError
 
 
 class ConfigStrings:
-
     AUTHORIZATION_2 = '2. Авторизация'
     BALANCE_MSG = 'Баланс вашей карты:'
     CARD_BLOCKED = 'Карта заблокирована'
@@ -17,7 +16,6 @@ class ConfigStrings:
     DATA_REPORTED = 'Данные внесены в отчет'
     DATABASE_CONNECTION_ERROR = f'Ошибка подключения к базе данных: {SQLError}'
     DEPOSITING_MONEY_3 = '3. Внесение денежных средств'
-
     ENTER_PAYEE_CARD = 'Введите номер карты получателя: '
     ENTER_SUM_TO_DEPOSIT = 'Введите сумму, которую желаете внести: '
     ENTER_SUM_TO_TRANSFER = 'Введите сумму, которую желаете перевести: '
@@ -26,9 +24,9 @@ class ConfigStrings:
     EURO = 'EUR'
     EXIT_4 = '4. Выход'
     EXIT_5 = '5. Завершить работу'
-    FILE_FOR_REPORTS_CREATED = 'Создан файл для отчетов о финансовых операциях'
     FILE_FOR_REPORTS_1 = 'report_1.csv'
     FILE_FOR_REPORTS_2 = 'report_2.csv'
+    FILE_FOR_REPORTS_CREATED = 'Создан файл для отчетов о финансовых операциях'
     FROM_CURRENCY = (
         'Какую валюту готовы предложить взамен? '
         '\n1. RUB\n2. USD\n3. EUR\n4. Выход из сервиса'
@@ -37,7 +35,6 @@ class ConfigStrings:
     GIVE_OPERATION = 'give'
     GO_ON = 'п'
     HOW_MUCH = 'Какая сумма Вас интересует?\n'
-
     INCORRECT_CHOICE = 'Неверный выбор. Пожалуйста, введите "Да" или "Нет".'
     INCORRECT_CHOICE_GO_ON_OR_LEAVE = (
         'Некорректный выбор. Пожалуйста, введите "П" или "В".'
@@ -56,11 +53,11 @@ class ConfigStrings:
     INPUT_LOGIN = 'Введите логин: '
     INPUT_NEW_PASSWORD = 'Введите новый пароль: '
     INPUT_NUMBER = 'Введите числовое значение'
-    INPUT_OPERATION_NUMBER = 'Введите номер действия: '
+    INPUT_NUMBER_OF_ACTION = 'Введите номер действия: '
+    INPUT_OPERATION_NUMBER = 'Введите номер операции: '
     INPUT_PASSWORD = 'Введите пароль: '
     INPUT_YOUR_CODE = 'Введите ваш код для восстановления: '
     INVALID_CODE = 'Неверный код. Нужно ввести 4-х значное целое число.'
-
     LEAVE = 'в'
     LOGIN_ALREADY_EXISTS = 'Этот логин уже занят. Попробуйте другой.'
     LOGIN_AND_PASSWORD_SHOULD_NOT_BE_EMPTY = (
@@ -79,7 +76,6 @@ class ConfigStrings:
     NULL_OR_NEGATIVE_SUM = (
         'Невозможно обменивать нулевую или отрицательную сумму'
     )
-
     OPERATION_CAN_NOT_BE_PERFORMED = 'Операция не может быть выполнена'
     OPERATION_WAS_NOT_PERFORMED = (
         'Операция не была выполнена. ' 'Запись в отчет не производится.'
@@ -108,7 +104,6 @@ class ConfigStrings:
         '\n1. RUB\n2. USD\n3. EUR\n4. Выход из сервиса'
     )
     TRANSFER_MONEY_4 = '4. Перевести денежные средства'
-
     UNKNOWN_CARD_NUMBER = (
         'Введен неизвестный номер карты. Пожалуйста, обратитесь в банк.'
     )
@@ -119,3 +114,6 @@ class ConfigStrings:
     WISH_TO_REGISTER = 'Хотите зарегистрироваться? (Да/Нет): '
     WISH_TO_RESET_PASSWORD = 'Хотите восстановить пароль? (Да/Нет): '
     YES = 'да'
+
+
+config = ConfigStrings()
