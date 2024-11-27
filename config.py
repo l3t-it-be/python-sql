@@ -51,6 +51,7 @@ class ConfigStrings:
     INPUT_CODE = 'Введите 4-х значный код для восстановления: '
     INPUT_CURRENCY_NUMBER = 'Введите номер валюты: '
     INPUT_LOGIN = 'Введите логин: '
+    INPUT_MONTHS_QUANTITY = 'Введите период расчета в месяцах (целое число): '
     INPUT_NEW_PASSWORD = 'Введите новый пароль: '
     INPUT_NUMBER = 'Введите числовое значение'
     INPUT_NUMBER_OF_ACTION = 'Введите номер действия: '
@@ -99,6 +100,7 @@ class ConfigStrings:
     SHOW_BALANCE_1 = '1. Узнать баланс'
     SUCCESSFUL_REGISTRATION = 'Пользователь успешно зарегистрирован. Логин:'
     SUCCESSFULLY_AUTHORIZED = 'Вы успешно авторизованы'
+    TARIFF_ALREADY_EXISTS = 'Тариф с таким названием уже добавлен в систему'
     TO_CURRENCY = (
         'Введите какую валюту желаете получить: '
         '\n1. RUB\n2. USD\n3. EUR\n4. Выход из сервиса'
@@ -107,6 +109,7 @@ class ConfigStrings:
     UNKNOWN_CARD_NUMBER = (
         'Введен неизвестный номер карты. Пожалуйста, обратитесь в банк.'
     )
+    USER_ALREADY_EXISTS = 'Пользователь c таким именем уже добавлен в систему'
     USER_NOT_FOUND = 'Пользователь не найден'
     USD = 'USD'
     WITHDRAW_MONEY_2 = '2. Снятие денежных средств'
