@@ -8,9 +8,9 @@ class Mobile:
         with MobileUsers() as mobile:
             mobile.create_tables()
             users = [
-                UserData(username='User1', balance=10000, tariff_ref=2),
-                UserData(username='User2', balance=10000, tariff_ref=3),
-                UserData(username='User3', balance=10000, tariff_ref=1),
+                UserData(user_name='User1', balance=10000, tariff_ref=2),
+                UserData(user_name='User2', balance=10000, tariff_ref=3),
+                UserData(user_name='User3', balance=10000, tariff_ref=1),
             ]
             for user in users:
                 mobile.add_user(user)

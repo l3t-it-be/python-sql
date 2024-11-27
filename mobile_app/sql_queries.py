@@ -8,7 +8,7 @@ from mobile_app import cmds
 
 @dataclass(kw_only=True)
 class UserData:
-    username: str
+    user_name: str
     balance: int
     tariff_ref: int
 
@@ -38,10 +38,12 @@ class MobileUsers(Initialization):
             except OperationalError:
                 print(config.DATABASE_CONNECTION_ERROR)
 
-    def is_login_unique(self, login: str) -> bool:
+    def is_user_name_unique(self, user_name: str) -> bool:
         """Проверка уникальности логина"""
-        script = cmds.ASSERT_LOGIN_IN_SYSTEM.format(table_name=self.table_name)
-        self.cursor.execute(script, (login.lower(),))
+        script = cmds.ASSERT_USER_NAME_IN_SYSTEM.format(
+            table_name=self.table_name
+        )
+        self.cursor.execute(script, (user_name.lower(),))
         existing_user = self.cursor.fetchone()
         return existing_user is None
 
@@ -56,15 +58,15 @@ class MobileUsers(Initialization):
 
     def add_user(self, user_data: UserData) -> None:
         """Добавление в таблицу пользователя (если такого еще нет)"""
-        if not self.is_login_unique(user_data.username.lower()):
-            print(user_data.username, config.USER_ALREADY_EXISTS)
+        if not self.is_user_name_unique(user_data.user_name.lower()):
+            print(user_data.user_name, config.USER_ALREADY_EXISTS)
             return
 
         script = cmds.INSERT_USERS_DATA.format(table_name=self.table_name)
         try:
             self.cursor.execute(
                 script,
-                (user_data.username, user_data.balance, user_data.tariff_ref),
+                (user_data.user_name, user_data.balance, user_data.tariff_ref),
             )
         except OperationalError:
             print(config.DATABASE_CONNECTION_ERROR)

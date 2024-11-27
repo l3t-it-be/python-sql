@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS {table_name}
     );
 """
 
-ASSERT_LOGIN_IN_SYSTEM = """
+ASSERT_USER_NAME_IN_SYSTEM = """
     SELECT 1
     FROM {table_name}
     WHERE LOWER(User_name) = ?
