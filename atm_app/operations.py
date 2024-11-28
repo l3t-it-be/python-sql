@@ -73,7 +73,7 @@ class Operation:
             print(config.OPERATION_WAS_NOT_PERFORMED)
             return
 
-        current_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        current_date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
         user_data = []
 
         if filename == config.FILE_FOR_REPORTS_1:

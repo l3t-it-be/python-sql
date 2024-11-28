@@ -11,6 +11,7 @@ class ConfigStrings:
         'Пользователь с таким номером карты уже зарегистрирован в системе'
     )
     CHOOSE_ACTION = 'Выберите действие:'
+    CONNECTION_PROBLEMS = 'Временные неполадки в сети'
     CORRECT_PIN_CODE_ENTERED = 'Введен верный пин-код'
     CURRENCY_EXCHANGE_SUCCESSFULLY_COMPLETED = 'Обмен валют успешно завершен'
     DATA_REPORTED = 'Данные внесены в отчет'
@@ -24,8 +25,12 @@ class ConfigStrings:
     EURO = 'EUR'
     EXIT_4 = '4. Выход'
     EXIT_5 = '5. Завершить работу'
+    FILE_FOR_MOBILE_REPORTS = 'report_mobile.csv'
     FILE_FOR_REPORTS_1 = 'report_1.csv'
     FILE_FOR_REPORTS_2 = 'report_2.csv'
+    FILE_FOR_MOBILE_REPORTS_CREATED = (
+        'Создан файл "report_mobile.csv" для отчетов о совершенных звонках'
+    )
     FILE_FOR_REPORTS_CREATED = 'Создан файл для отчетов о финансовых операциях'
     FROM_CURRENCY = (
         'Какую валюту готовы предложить взамен? '
@@ -65,11 +70,16 @@ class ConfigStrings:
         'Логин и пароль не могут быть пустыми'
     )
     LOGIN_SHOULD_NOT_BE_NULL = 'Логин не может быть пустым'
+    MINUTES = 'мин'
     MSG_ENTER_PIN_CODE = 'Введите пин-код: '
     MSG_EXIT = 'Выход из программы'
     MSG_GOODBYE = 'До свидания! Всего вам доброго!'
+    MOBILE_OPERATORS = ['Mts_Mts', 'Mts_Tele2', 'Mts_Yota']
     NO = 'нет'
     NOT_ENOUGH_MONEY = 'На вашей карте недостаточно денежных средств'
+    NOT_ENOUGH_MONEY_ON_BALANCE = (
+        'Недостаточно средств на балансе для осуществления звонка'
+    )
     NOT_REGISTERED = (
         'Вы не зарегистрированы в нашей системе.\n'
         'Пожалуйста, обратитесь в банк.'
@@ -89,15 +99,18 @@ class ConfigStrings:
     PASSWORD_SUCCESSFULLY_CHANGED = 'Пароль успешно изменен'
     PAYEE_CARD_BLOCKED = 'Карта получателя заблокирована'
     PAYEE_CARD_NOT_FOUND = 'Карта получателя не найдена'
+    PRICES_ALREADY_ADDED = 'Цены уже добавлены в таблицу'
     REGISTRATION_1 = '1. Регистрация'
     RESET_PASSWORD_3 = '3. Восстановление пароля'
     RUB = 'RUB'
+    RUB_RUS = 'руб'
     SAME_CARD = (
         'Вы указали номер собственной карты.\n'
         'Невозможно переводить денежные средства самому себе.'
     )
     SAME_CURRENCY = 'Невозможно производить обмен двух одинаковых валют'
     SHOW_BALANCE_1 = '1. Узнать баланс'
+    SUCCESSFUL_CALL = 'Звонок завершен'
     SUCCESSFUL_REGISTRATION = 'Пользователь успешно зарегистрирован. Логин:'
     SUCCESSFULLY_AUTHORIZED = 'Вы успешно авторизованы'
     TARIFF_ALREADY_EXISTS = 'Тариф с таким названием уже добавлен в систему'
