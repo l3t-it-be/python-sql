@@ -49,12 +49,10 @@ class Operation:
     def create_csv(filename: str) -> None:
         """Создание файла для отчетов"""
         with open(filename, 'a', newline='') as csvfile:
-            if filename == 'report_1.csv':
-                data = [('Date', 'Card number', 'Operation type', 'Amount')]
-            elif filename == 'report_2.csv':
-                data = [
-                    ('Date', 'Sender', 'Operation type', 'Amount', 'Payee')
-                ]
+            if filename == config.FILE_FOR_REPORTS_1:
+                data = config.DATA_FOR_REPORTS_1
+            elif filename == config.FILE_FOR_REPORTS_2:
+                data = config.DATA_FOR_REPORTS_2
 
             writer = csv.writer(csvfile, delimiter=';')
             writer.writerows(data)

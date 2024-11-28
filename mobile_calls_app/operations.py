@@ -9,7 +9,7 @@ class Operation:
     def create_csv() -> None:
         """Создание файла для отчетов"""
         with open(config.FILE_FOR_MOBILE_REPORTS, 'a', newline='') as csvfile:
-            data = [('Date', 'Operator', 'Count_min', 'Amount')]
+            data = config.DATA_FOR_MOBILE_REPORTS
             writer = csv.writer(csvfile, delimiter=';')
             writer.writerows(data)
         print(config.FILE_FOR_MOBILE_REPORTS_CREATED)
