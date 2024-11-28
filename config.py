@@ -17,8 +17,8 @@ class ConfigStrings:
     DATA_FOR_MOBILE_REPORTS = [('Date', 'Operator', 'Count_min', 'Amount')]
     DATA_FOR_REPORTS_1 = [('Date', 'Card number', 'Operation type', 'Amount')]
     DATA_FOR_REPORTS_2 = [
-                    ('Date', 'Sender', 'Operation type', 'Amount', 'Payee')
-                ]
+        ('Date', 'Sender', 'Operation type', 'Amount', 'Payee')
+    ]
     DATA_REPORTED = 'Данные внесены в отчет'
     DATABASE_CONNECTION_ERROR = f'Ошибка подключения к базе данных: {SQLError}'
     DEPOSITING_MONEY_3 = '3. Внесение денежных средств'
