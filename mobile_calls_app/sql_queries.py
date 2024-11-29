@@ -6,7 +6,7 @@ from sqlite3 import OperationalError
 from config import config
 from initialize_bd import Initialization
 from mobile_calls_app import cmds
-from mobile_calls_app.operations import operation
+from mobile_calls_app.reports import report
 
 
 @dataclass(kw_only=True)
@@ -140,7 +140,7 @@ class MobileCalls(Initialization):
 
         if balance >= amount:
             if self.update_balance(user_id, amount):
-                operation.report_operation(
+                report.report_operation(
                     date.strftime('%d-%m-%Y %H:%M:%S'),
                     operator,
                     count_min,

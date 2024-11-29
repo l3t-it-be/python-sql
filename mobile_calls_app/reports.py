@@ -4,7 +4,7 @@ import os
 from config import config
 
 
-class Operation:
+class Report:
     @staticmethod
     def create_csv() -> None:
         """Создание файла для отчетов"""
@@ -37,4 +37,4 @@ class Operation:
         print(config.DATA_REPORTED, config.FILE_FOR_MOBILE_REPORTS)
 
 
-operation = Operation()
+report = Report()

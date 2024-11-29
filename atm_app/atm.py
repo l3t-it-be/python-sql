@@ -1,6 +1,9 @@
 from atm_app.operations import Operation
+from atm_app.reports import Report
 from atm_app.sql_queries import SQLAtm, UserData
 from config import config
+
+report = Report()
 
 
 class ATM:
@@ -19,52 +22,43 @@ class ATM:
 
             while True:
                 card_number = input(config.ENTER_YOUR_CARD)
-                if atm.insert_card(card_number):
-                    if atm.input_code(card_number):
-                        operation = Operation()
-                        while True:
-                            choice, data = operation.choose_operation(
-                                card_number
-                            )
-                            current_operation = choice
-
-                            if current_operation in ('2', '3'):
-                                amount = data
-                                if amount is not False:
-                                    filename = config.FILE_FOR_REPORTS_1
-                                    operation.report_operation(
-                                        filename,
-                                        card_number,
-                                        current_operation,
-                                        amount,
-                                    )
-                            elif current_operation == '4':
-                                amount, card_number2 = data
-                                if amount is False:
-                                    print(
-                                        config.OPERATION_CAN_NOT_BE_PERFORMED
-                                    )
-                                    continue
-                                filename = config.FILE_FOR_REPORTS_1
-                                operation.report_operation(
-                                    filename,
-                                    card_number,
-                                    current_operation,
-                                    amount,
-                                )
-                                if card_number2 is not None:
-                                    filename = config.FILE_FOR_REPORTS_2
-                                    operation.report_operation(
-                                        filename,
-                                        card_number,
-                                        current_operation,
-                                        amount,
-                                        card_number2,
-                                    )
-                    else:
-                        break
-                else:
+                if not atm.insert_card(card_number):
                     break
+                if not atm.input_code(card_number):
+                    break
+
+                operation = Operation()
+                while True:
+                    choice, data = operation.choose_operation(card_number)
+
+                    if choice in ('2', '3'):
+                        amount = data
+                        if amount is not False:
+                            report.report_operation(
+                                config.FILE_FOR_REPORTS_1,
+                                card_number,
+                                choice,
+                                amount,
+                            )
+                    elif choice == '4':
+                        amount, card_number2 = data
+                        if amount is False:
+                            print(config.OPERATION_CAN_NOT_BE_PERFORMED)
+                            continue
+                        report.report_operation(
+                            config.FILE_FOR_REPORTS_1,
+                            card_number,
+                            choice,
+                            amount,
+                        )
+                        if card_number2 is not None:
+                            report.report_operation(
+                                config.FILE_FOR_REPORTS_2,
+                                card_number,
+                                choice,
+                                amount,
+                                card_number2,
+                            )
 
 
 if __name__ == '__main__':
